@@ -106,7 +106,7 @@ func populateChainOfTrust(qname string) (*ChainOfTrust, error) {
 		// get DS record
 		r, err := query(qname, dns.TypeDS)
 		if err != nil || r.Answer == nil {
-			log.Printf("Cannot retrieve DS for %s: %s\n", qname, err)
+			log.Printf("Cannot retrieve DS for %s: %v\n", qname, err)
 			return nil, nil
 		}
 		if r.Rcode == dns.RcodeNameError {
@@ -160,6 +160,9 @@ func populateChainOfTrust(qname string) (*ChainOfTrust, error) {
 	// optimization - we're trusting the TLD (i.e. .org) zone and will only
 	// verify the zones up to the TLD
 	zonesToVerify := len(qnameComponents) - 2
+	if zonesToVerify < 0 {
+		zonesToVerify = 0
+	}
 
 	chainOfTrust.delegationChain = make([]SignedZone, 0, zonesToVerify)
 
