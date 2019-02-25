@@ -131,10 +131,6 @@ func populateChainOfTrust(qname string) (*ChainOfTrust, error) {
 			fmt.Printf("Cannot retrieve DNSKEY %s: %s\n", qname, err)
 			return nil, err
 		}
-		if r.Rcode == dns.RcodeNameError {
-			fmt.Printf("No such domain %s\n", qname)
-			return nil, err
-		}
 
 		signedZone.dnskey.rrSet = make([]dns.RR, 0, len(r.Answer))
 
@@ -182,10 +178,6 @@ func populateChainOfTrust(qname string) (*ChainOfTrust, error) {
 		fmt.Printf("Cannot retrieve A %s: %s\n", qname, err)
 		return nil, err
 	}
-	if r.Rcode == dns.RcodeNameError {
-		fmt.Printf("No such domain %s\n", qname)
-		return nil, err
-	}
 
 	chainOfTrust.a = &SignedRRSet{}
 	chainOfTrust.a.rrSet = make([]dns.RR, 0, len(r.Answer))
@@ -203,10 +195,6 @@ func populateChainOfTrust(qname string) (*ChainOfTrust, error) {
 	r, err = query(qname, dns.TypeAAAA)
 	if err != nil || r == nil {
 		fmt.Printf("Cannot retrieve AAAA %s: %s\n", qname, err)
-		return chainOfTrust, err
-	}
-	if r.Rcode == dns.RcodeNameError {
-		fmt.Printf("No such domain %s\n", qname)
 		return chainOfTrust, err
 	}
 
