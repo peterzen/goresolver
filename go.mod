@@ -1,4 +1,4 @@
-module github.com/peterzen/dnssecvalidator
+module github.com/peterzen/goresolver
 
 require (
 	github.com/miekg/dns v1.1.4

@@ -1,4 +1,4 @@
-package dnssecvalidator
+package goresolver
 
 import (
 	"github.com/miekg/dns"
