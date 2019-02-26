@@ -6,7 +6,7 @@ import (
 )
 
 func TestLookupInvalid1(t *testing.T) {
-	dnsClientConfig, err := dns.ClientConfigFromFile("./test/resolv.conf")
+	dnsClientConfig, err := dns.ClientConfigFromFile("./testdata/resolv.conf")
 	SetClientConfig(dnsClientConfig)
 	ips, err := LookupIP("sigfail.verteiltesysteme.net.")
 	if err == nil {
@@ -17,24 +17,36 @@ func TestLookupInvalid1(t *testing.T) {
 	}
 }
 
-func TestLookupValid1(t *testing.T) {
-	err := Initialize("./test/resolv.conf")
-	if err != nil {
-		t.Errorf("dnssec initializarion failed: %v", err)
+func TestLookupInvalid2(t *testing.T) {
+	dnsClientConfig, err := dns.ClientConfigFromFile("./testdata/resolv.conf")
+	SetClientConfig(dnsClientConfig)
+	ips, err := LookupIP("invalid.stakey.org.")
+	if err == nil {
+		t.Errorf("dnssec validation failed: %v", err)
 	}
-	ips, err := LookupIP("decred.org.")
+	if len(ips) > 0 {
+		t.Error("lookup should return no results")
+	}
+}
+
+func TestLookupValid1(t *testing.T) {
+	err := Initialize("./testdata/resolv.conf")
+	if err != nil {
+		t.Errorf("dnssec initialization failed: %v", err)
+	}
+	ips, err := LookupIP("stakey.org.")
 	if err != nil {
 		t.Errorf("dnssec validation failed: %v", err)
 	}
-	if len(ips) < 1 {
-		t.Error("lookup returned no results")
+	if len(ips) != 0 {
+		t.Error("lookup returned unexpected results")
 	}
 }
 
 func TestLookupValid2(t *testing.T) {
-	err := Initialize("./test/resolv.conf")
+	err := Initialize("./testdata/resolv.conf")
 	if err != nil {
-		t.Errorf("dnssec initializarion failed: %v", err)
+		t.Errorf("dnssec initialization failed: %v", err)
 	}
 	ips, err := LookupIP("testnet-seed.stakey.org.")
 	if err != nil {
@@ -46,7 +58,7 @@ func TestLookupValid2(t *testing.T) {
 }
 
 func TestLookupValid3(t *testing.T) {
-	err := Initialize("./test/resolv.conf")
+	err := Initialize("./testdata/resolv.conf")
 	if err != nil {
 		t.Errorf("dnssec initialization failed: %v", err)
 	}
@@ -60,13 +72,13 @@ func TestLookupValid3(t *testing.T) {
 }
 
 func TestLookupAddr(t *testing.T) {
-	err := Initialize("./test/resolv.conf")
+	err := Initialize("./testdata/resolv.conf")
 	if err != nil {
-		t.Errorf("dnssec initializarion failed: %v", err)
+		t.Errorf("dnssec initialization failed: %v", err)
 	}
 	names, err := LookupAddr("decred.org.")
 	if err != nil {
-		t.Error("err should be nil")
+		t.Errorf("err should be nil %#v", err)
 	}
 	if len(names) < 1 {
 		t.Error("lookup returned no results")

@@ -3,23 +3,30 @@ package dnssecvalidator
 import (
 	"errors"
 	"fmt"
+	"github.com/miekg/dns"
 	"log"
 	"strings"
 	"time"
-
-	"github.com/miekg/dns"
 )
 
 const (
 	DefaultTimeout time.Duration = 5 * time.Second
 )
 
-type SignedZone struct {
-	zone        string
-	dnskey      SignedRRSet
-	ds          SignedRRSet
-	signingKeys SigningKeys
-}
+var (
+	dnsClient       *dns.Client
+	dnsClientConfig *dns.ClientConfig
+)
+
+var (
+	ErrNsNotAvailable       = errors.New("no name server to answer the question")
+	ErrDnskeyNotAvailable   = errors.New("DNSKEY RR does not exist")
+	ErrDsNotAvailable       = errors.New("DS RR does not exist")
+	ErrRrsigValidationError = errors.New("RR doesn't validate against RRSIG")
+	ErrRrsigValidityPeriod  = errors.New("invalid RRSIG validity period")
+	ErrUnknownDsDigestType  = errors.New("unknown DS digest type")
+	ErrDsInvalid            = errors.New("DS RR does not match DNSKEY")
+)
 
 type SignedRRSet struct {
 	rrSet []dns.RR
@@ -31,25 +38,6 @@ type ChainOfTrust struct {
 	a               *SignedRRSet
 	aaaa            *SignedRRSet
 }
-
-type SigningKeys struct {
-	zsk *dns.DNSKEY
-	ksk *dns.DNSKEY
-}
-
-var (
-	dnsClient       *dns.Client
-	dnsClientConfig *dns.ClientConfig
-)
-
-var (
-	ErrNsNotAvailable      = errors.New("no name server to answer the question")
-	ErrDnskeyNotAvailable  = errors.New("DNSKEY RR does not exist")
-	ErrDsNotAvailable      = errors.New("DS RR does not exist")
-	ErrRrsigValidityPeriod = errors.New("invalid validity period on signature")
-	ErrUnknownDigestType   = errors.New("unknown digest type")
-	ErrDsInvalid           = errors.New("DS RR does not match DNSKEY")
-)
 
 func dnsMessageInit() *dns.Msg {
 	dnsMessage := &dns.Msg{
@@ -97,10 +85,9 @@ func populateChainOfTrust(qname string) (*ChainOfTrust, error) {
 	queryDelegation := func(qname string) (signedZone *SignedZone, err error) {
 
 		signedZone = &SignedZone{
-			zone:        qname,
-			ds:          SignedRRSet{},
-			dnskey:      SignedRRSet{},
-			signingKeys: SigningKeys{},
+			zone:   qname,
+			ds:     SignedRRSet{},
+			dnskey: SignedRRSet{},
 		}
 
 		// get DS record
@@ -133,17 +120,13 @@ func populateChainOfTrust(qname string) (*ChainOfTrust, error) {
 		}
 
 		signedZone.dnskey.rrSet = make([]dns.RR, 0, len(r.Answer))
+		signedZone.signingKeys = make(map[uint16]*dns.DNSKEY)
 
 		for _, rr := range r.Answer {
 			switch k := rr.(type) {
 			case *dns.DNSKEY:
 				signedZone.dnskey.rrSet = append(signedZone.dnskey.rrSet, rr)
-				if k.Flags == 256 {
-					signedZone.signingKeys.zsk = k
-				}
-				if k.Flags == 257 {
-					signedZone.signingKeys.ksk = k
-				}
+				signedZone.addSigningKey(k)
 			case *dns.RRSIG:
 				signedZone.dnskey.rrSig = k
 			}
@@ -155,7 +138,7 @@ func populateChainOfTrust(qname string) (*ChainOfTrust, error) {
 	qnameComponents := strings.Split(qname, ".")
 	// optimization - we're trusting the TLD (i.e. .org) zone and will only
 	// verify the zones up to the TLD
-	zonesToVerify := len(qnameComponents) - 2
+	zonesToVerify := len(qnameComponents) - 1
 	if zonesToVerify < 0 {
 		zonesToVerify = 0
 	}
@@ -168,6 +151,9 @@ func populateChainOfTrust(qname string) (*ChainOfTrust, error) {
 		if err != nil || delegation == nil {
 			//log.Printf("zone query failed: %v\n", err)
 			return nil, err
+		}
+		if i > 0 {
+			chainOfTrust.delegationChain[i-1].parentZone = delegation
 		}
 		chainOfTrust.delegationChain = append(chainOfTrust.delegationChain, *delegation)
 	}
@@ -215,28 +201,22 @@ func populateChainOfTrust(qname string) (*ChainOfTrust, error) {
 // DNSSEC chain of trust validation
 func validateChainOfTrust(chainOfTrust *ChainOfTrust) (err error) {
 
+	signedZone := chainOfTrust.delegationChain[0]
+
 	// Verify the RRSIG of the requested RRset with the public ZSK.
 	if len(chainOfTrust.a.rrSet) > 0 {
-		err := chainOfTrust.a.rrSig.Verify(chainOfTrust.delegationChain[0].signingKeys.zsk, chainOfTrust.a.rrSet)
+		err := signedZone.validateRRSIG(chainOfTrust.a.rrSig, chainOfTrust.a.rrSet)
 		if err != nil {
 			fmt.Printf("validation A: %s\n", err)
 			return err
 		}
-		if chainOfTrust.a.rrSig.ValidityPeriod(time.Now()) == false {
-			log.Printf("invalid validity period on signature: %s\n", err)
-			return ErrRrsigValidityPeriod
-		}
 	}
 
 	if len(chainOfTrust.aaaa.rrSet) > 0 {
-		err = chainOfTrust.aaaa.rrSig.Verify(chainOfTrust.delegationChain[0].signingKeys.zsk, chainOfTrust.aaaa.rrSet)
+		err := signedZone.validateRRSIG(chainOfTrust.aaaa.rrSig, chainOfTrust.aaaa.rrSet)
 		if err != nil {
 			fmt.Printf("validation AAAA: %s\n", err)
 			return err
-		}
-		if chainOfTrust.aaaa.rrSig.ValidityPeriod(time.Now()) == false {
-			log.Printf("invalid validity period on signature: %s\n", err)
-			return ErrRrsigValidityPeriod
 		}
 	}
 
@@ -248,16 +228,11 @@ func validateChainOfTrust(chainOfTrust *ChainOfTrust) (err error) {
 		}
 
 		// Verify the RRSIG of the DNSKEY RRset with the public KSK.
-		err = signedZone.dnskey.rrSig.Verify(signedZone.signingKeys.ksk, signedZone.dnskey.rrSet)
+		err := signedZone.validateRRSIG(signedZone.dnskey.rrSig, signedZone.dnskey.rrSet)
 
 		if err != nil {
 			log.Printf("validation DNSKEY: %s\n", err)
-			return err
-		}
-
-		if signedZone.dnskey.rrSig.ValidityPeriod(time.Now()) == false {
-			log.Printf("invalid validity period on signature: %s\n", err)
-			return ErrRrsigValidityPeriod
+			return ErrRrsigValidationError
 		}
 
 		if len(signedZone.ds.rrSet) < 1 {
@@ -265,17 +240,17 @@ func validateChainOfTrust(chainOfTrust *ChainOfTrust) (err error) {
 			return ErrDsNotAvailable
 		}
 
-		parentDs := signedZone.ds.rrSet[0].(*dns.DS)
-
-		if parentDs.DigestType != dns.SHA256 {
-			log.Printf("Unknown digest type (%d) on DS RR", parentDs.DigestType)
-			return ErrUnknownDigestType
+		if signedZone.parentZone != nil {
+			err := signedZone.parentZone.validateRRSIG(signedZone.ds.rrSig, signedZone.ds.rrSet)
+			if err != nil {
+				log.Printf("DS on %s doesn't validate against RRSIG %d\n", signedZone.zone, signedZone.ds.rrSig.KeyTag)
+				return ErrDsInvalid
+			}
 		}
 
-		parentDsDigest := strings.ToUpper(parentDs.Digest)
-		ds := strings.ToUpper(signedZone.signingKeys.ksk.ToDS(parentDs.DigestType).Digest)
-		if parentDsDigest != ds {
-			log.Printf("DS does not match DNSKEY\n")
+		err = signedZone.validateDS(signedZone.ds.rrSet)
+		if err != nil {
+			log.Printf("DS does not validate: %s", err)
 			return ErrDsInvalid
 		}
 	}

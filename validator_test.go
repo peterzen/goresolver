@@ -6,7 +6,7 @@ import (
 )
 
 func TestSetClientConfig(t *testing.T) {
-	dnsClientConfig, err := dns.ClientConfigFromFile("./test/resolv.conf")
+	dnsClientConfig, err := dns.ClientConfigFromFile("./testdata/resolv.conf")
 
 	if dnsClientConfig == nil || err != nil {
 		t.Errorf("resolv.conf not found: %v", dnsClientConfig)
@@ -21,4 +21,8 @@ func TestDnsMessageInit(t *testing.T) {
 	if opt.Do() != true {
 		t.Logf("DO bit not enabled")
 	}
+}
+
+func TestChainOfTrust(t *testing.T) {
+
 }

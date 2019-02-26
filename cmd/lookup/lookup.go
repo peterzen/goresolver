@@ -5,6 +5,7 @@ import (
 	"github.com/miekg/dns"
 	"github.com/peterzen/dnssecvalidator"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -21,7 +22,7 @@ func main() {
 	//	Port:    "5354",
 	//}
 
-	err := dnssecvalidator.Initialize("/etc/resolv.conf")
+	err := dnssecvalidator.Initialize("./testdata/resolv.conf")
 
 	if err != nil {
 		fmt.Printf("Cannot initialize the local resolver: %s\n", err)
@@ -36,5 +37,5 @@ func main() {
 	}
 
 	fmt.Println("validation successful")
-	fmt.Printf("IPs %v", ips)
+	fmt.Printf("IPs %s\n", strings.Join(ips, "\n"))
 }
