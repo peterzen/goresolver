@@ -21,21 +21,26 @@ func main() {
 	//	Servers: []string{"localhost"},
 	//	Port:    "5354",
 	//}
-
-	err := goresolver.Initialize("./testdata/resolv.conf")
+	resolver, err := goresolver.NewResolver("./testdata/resolv.conf")
 
 	if err != nil {
 		fmt.Printf("Cannot initialize the local resolver: %s\n", err)
 		os.Exit(1)
 	}
 
-	ips, err := goresolver.LookupAddr(dns.Fqdn(hostname))
+	ips, err := resolver.LookupIP(dns.Fqdn(hostname))
 
 	if err != nil {
 		fmt.Printf("Validation failed: %s\n", err)
 		os.Exit(1)
 	}
 
+	ipStr := make([]string, 0, len(ips))
+
+	for _, ip := range ips {
+		ipStr = append(ipStr, ip.String())
+	}
+
 	fmt.Println("validation successful")
-	fmt.Printf("IPs %s\n", strings.Join(ips, "\n"))
+	fmt.Printf("IPs %s\n", strings.Join(ipStr, "\n"))
 }

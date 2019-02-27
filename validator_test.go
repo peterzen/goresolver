@@ -1,18 +1,14 @@
 package goresolver
 
 import (
-	"github.com/miekg/dns"
 	"testing"
 )
 
 func TestSetClientConfig(t *testing.T) {
-	dnsClientConfig, err := dns.ClientConfigFromFile("./testdata/resolv.conf")
-
-	if dnsClientConfig == nil || err != nil {
-		t.Errorf("resolv.conf not found: %v", dnsClientConfig)
+	resolver, err := NewResolver("./testdata/resolv.conf")
+	if resolver.dnsClientConfig == nil || err != nil {
+		t.Errorf("resolv.conf not found: %v", resolver.dnsClientConfig)
 	}
-
-	SetClientConfig(dnsClientConfig)
 }
 
 func TestDnsMessageInit(t *testing.T) {
@@ -23,6 +19,26 @@ func TestDnsMessageInit(t *testing.T) {
 	}
 }
 
-func TestChainOfTrust(t *testing.T) {
+func TestPopulateChainOfTrust(t *testing.T) {
+	//var Config = spew.ConfigState{
+	//	Indent:                  " ",
+	//	DisablePointerMethods:   false,
+	//	DisableCapacities:       true,
+	//	DisablePointerAddresses: true,
+	//}
+	//resolver, err := NewResolver("./testdata/resolv.conf")
+	//chainOfTrust, err := resolver.populateChainOfTrust("testnet-seed.decred.org.")
+	//
+	//if err != nil || chainOfTrust == nil {
+	//	t.Error("populateChainOfTrust unexpected return value")
+	//}
+	//fmt.Printf("%#v", chainOfTrust)
+	//m,err:=json.Marshal(chainOfTrust)
+	//fmt.Printf("%s\n\n",m)
+	//Config.Dump(chainOfTrust)
+	//fmt.Printf("%v", chainOfTrust)
+}
+
+func TestValidateChainOfTrust(t *testing.T) {
 
 }

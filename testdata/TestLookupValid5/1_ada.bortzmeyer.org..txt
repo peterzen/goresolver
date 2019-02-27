@@ -1,0 +1,2 @@
+ada.bortzmeyer.org.	892	IN	A	204.62.14.153
+ada.bortzmeyer.org.	892	IN	RRSIG	A 8 3 86400 20190307081432 20190221161507 16041 bortzmeyer.org. ossBGBThwNzIlvtjDJ1Oej/JVIXoZ8dHjfu7/a9JjpS6Uol/jDSbdGsnOwzJj3LPF936IiqpMW3DopwInW3+pU0+qzhSXa/C1WSloAGAlYSqWrtV3F3xinwDYuKRSYy5OfRTxOcBE1titm7T6sbDhpXT3JjvXdjlakL7qR129hk=

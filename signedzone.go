@@ -24,6 +24,9 @@ func (z SignedZone) addSigningKey(k *dns.DNSKEY) {
 }
 
 func (z SignedZone) validateRRSIG(sig *dns.RRSIG, rrSet []dns.RR) (err error) {
+	if sig == nil {
+		return ErrInvalidRRsig
+	}
 	// Verify the RRSIG of the DNSKEY RRset
 	key := z.getKeyByTag(sig.KeyTag)
 	if key == nil {

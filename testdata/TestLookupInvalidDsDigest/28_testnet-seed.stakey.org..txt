@@ -1,0 +1,17 @@
+testnet-seed.stakey.org.	28	IN	AAAA	2600:1700:d610:1560::49
+testnet-seed.stakey.org.	28	IN	AAAA	2a01:4f8:c0c:246e::2
+testnet-seed.stakey.org.	28	IN	AAAA	2a02:1205:501e:1880:c41:2067:5649:37e5
+testnet-seed.stakey.org.	28	IN	AAAA	2a02:7b40:d418:61d6::1
+testnet-seed.stakey.org.	28	IN	AAAA	2001:19f0:6c01:1114:5400:1ff:febd:e5f4
+testnet-seed.stakey.org.	28	IN	AAAA	2001:41d0:1:e571::5
+testnet-seed.stakey.org.	28	IN	AAAA	2001:41d0:1:e571::6
+testnet-seed.stakey.org.	28	IN	AAAA	2001:41d0:1:e571::11
+testnet-seed.stakey.org.	28	IN	AAAA	2001:41d0:2:b57f::2
+testnet-seed.stakey.org.	28	IN	AAAA	2001:41d0:2:b57f::6
+testnet-seed.stakey.org.	28	IN	AAAA	2001:41d0:2:b57f::7
+testnet-seed.stakey.org.	28	IN	AAAA	2001:41d0:2:b57f::9
+testnet-seed.stakey.org.	28	IN	AAAA	2001:41d0:2:b57f::19
+testnet-seed.stakey.org.	28	IN	AAAA	2001:41d0:2:b57f::26
+testnet-seed.stakey.org.	28	IN	AAAA	2001:41d0:8:45b4::3
+testnet-seed.stakey.org.	28	IN	AAAA	2001:41d0:303:18c6::
+testnet-seed.stakey.org.	28	IN	RRSIG	AAAA 10 3 30 20190323202913 20190223202913 6257 testnet-seed.stakey.org. ean+rIs4COsvgp772B2ACMNMBTDUsf9B1AnYu0a/n/0Sc9xIce8/brv2WKaYtwprlGoVZdraAjlDW3+jsreU4GD76qHOe3CNe1rNlDTWJM2szZDW26ATpRSZwNPmk/E69hwc6deGmgGG7WHoKbayt/SxzA5rXPNtX4vXkLhsPCQ=

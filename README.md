@@ -16,7 +16,6 @@ Following these cryptographic verifications, the package then verifies the chain
 
 In case of any validation errors, the method return a non-nil `err` value, and an empty result set.  
 
-In case the queried zone is not DNSSEC-enabled (i.e., it does not have a `DS` record in the parent zone), the library delegates the query to `net.LookupIP`.
  
 ## Documentation
 
@@ -37,3 +36,7 @@ if err != nil {
 ```bash
 $ go get -u github.com/peterzen/goresolver
 ```
+
+## Test coverage
+
+See [test-coverage.txt](test-coverage.txt)

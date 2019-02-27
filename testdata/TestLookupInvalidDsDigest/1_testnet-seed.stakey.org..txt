@@ -1,0 +1,17 @@
+testnet-seed.stakey.org.	28	IN	A	192.169.154.217
+testnet-seed.stakey.org.	28	IN	A	192.227.137.113
+testnet-seed.stakey.org.	28	IN	A	198.46.161.116
+testnet-seed.stakey.org.	28	IN	A	24.80.60.18
+testnet-seed.stakey.org.	28	IN	A	46.182.18.111
+testnet-seed.stakey.org.	28	IN	A	50.30.37.156
+testnet-seed.stakey.org.	28	IN	A	51.38.68.167
+testnet-seed.stakey.org.	28	IN	A	85.255.13.238
+testnet-seed.stakey.org.	28	IN	A	95.216.14.110
+testnet-seed.stakey.org.	28	IN	A	104.197.26.188
+testnet-seed.stakey.org.	28	IN	A	136.243.50.159
+testnet-seed.stakey.org.	28	IN	A	142.93.51.247
+testnet-seed.stakey.org.	28	IN	A	144.172.91.111
+testnet-seed.stakey.org.	28	IN	A	147.135.209.199
+testnet-seed.stakey.org.	28	IN	A	149.202.215.198
+testnet-seed.stakey.org.	28	IN	A	178.63.209.138
+testnet-seed.stakey.org.	28	IN	RRSIG	A 10 3 30 20190323202913 20190223202913 6257 testnet-seed.stakey.org. owNFJeglc5qapEKWTsHWriKAyhU1yixmQiiCXy9qyKxuj46IDw6zwIAScstMaypCPjcmb6MS/q+7T1/YO0TKzatcpFDe5GbXaJM8/8mEsPqVSKVKJhhon6xjLfcAC62TiNuNEcYg/TGao6uMAndh6OLpUvLsbmKLpokFk5qPqbI=
