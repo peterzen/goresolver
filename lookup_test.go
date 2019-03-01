@@ -29,7 +29,7 @@ func mockQueryUpdate(qname string, qtype uint16) (*dns.Msg, error) {
 	if _, err := os.Stat(mockDir); os.IsNotExist(err) {
 		os.Mkdir(mockDir, 0755)
 	}
-	f, err := os.Create(mockFile)
+	f, _ := os.Create(mockFile)
 	if f != nil {
 		s := make([]string, 0, len(r.Answer))
 		for _, rr := range r.Answer {
@@ -81,7 +81,7 @@ func TestInitialize(t *testing.T) {
 }
 
 //func TestLookupInvalid1(t *testing.T) {
-//	resolver, err := NewResolver("./testdata/resolv.conf")
+//	resolver, _ := NewResolver("./testdata/resolv.conf")
 //	testName = t.Name()
 //	//resolver.query = mockQuery
 //	ips, err := resolver.LookupIP("sigfail.verteiltesysteme.net.")
@@ -94,7 +94,7 @@ func TestInitialize(t *testing.T) {
 //}
 
 func TestLookupMissingResource(t *testing.T) {
-	resolver, err := NewResolver("./testdata/resolv.conf")
+	resolver, _ := NewResolver("./testdata/resolv.conf")
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("invalid.stakey.org.")
@@ -107,12 +107,12 @@ func TestLookupMissingResource(t *testing.T) {
 }
 
 func TestLookupValid1(t *testing.T) {
-	resolver, err := NewResolver("./testdata/resolv.conf")
+	resolver, _ := NewResolver("./testdata/resolv.conf")
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("stakey.org.")
 	if err != nil {
-		t.Error("shouldn't return err", err)
+		t.Error("shouldn't return err: ", err)
 	}
 	if len(ips) < 1 {
 		t.Error("lookup should return results")
@@ -120,7 +120,7 @@ func TestLookupValid1(t *testing.T) {
 }
 
 func TestLookupAAAAOnly(t *testing.T) {
-	resolver, err := NewResolver("./testdata/resolv.conf")
+	resolver, _ := NewResolver("./testdata/resolv.conf")
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("stakey.org.")
@@ -133,7 +133,7 @@ func TestLookupAAAAOnly(t *testing.T) {
 }
 
 func TestLookupValid2(t *testing.T) {
-	resolver, err := NewResolver("./testdata/resolv.conf")
+	resolver, _ := NewResolver("./testdata/resolv.conf")
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("testnet-seed.stakey.org.")
@@ -146,7 +146,7 @@ func TestLookupValid2(t *testing.T) {
 }
 
 func TestLookupResourceNotSigned(t *testing.T) {
-	resolver, err := NewResolver("./testdata/resolv.conf")
+	resolver, _ := NewResolver("./testdata/resolv.conf")
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("google.com.")
@@ -159,7 +159,7 @@ func TestLookupResourceNotSigned(t *testing.T) {
 }
 
 func TestLookupValid4(t *testing.T) {
-	resolver, err := NewResolver("./testdata/resolv.conf")
+	resolver, _ := NewResolver("./testdata/resolv.conf")
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("dnssec-deployment.org.")
@@ -172,7 +172,7 @@ func TestLookupValid4(t *testing.T) {
 }
 
 func TestLookupValid5(t *testing.T) {
-	resolver, err := NewResolver("./testdata/resolv.conf")
+	resolver, _ := NewResolver("./testdata/resolv.conf")
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("ada.bortzmeyer.org.")
@@ -185,7 +185,7 @@ func TestLookupValid5(t *testing.T) {
 }
 
 func TestLookupInValidMissingDnskey(t *testing.T) {
-	resolver, err := NewResolver("./testdata/resolv.conf")
+	resolver, _ := NewResolver("./testdata/resolv.conf")
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("stakey.org.")
@@ -198,7 +198,7 @@ func TestLookupInValidMissingDnskey(t *testing.T) {
 }
 
 func TestLookupInvalidDsDigest(t *testing.T) {
-	resolver, err := NewResolver("./testdata/resolv.conf")
+	resolver, _ := NewResolver("./testdata/resolv.conf")
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("testnet-seed.stakey.org.")
@@ -211,7 +211,7 @@ func TestLookupInvalidDsDigest(t *testing.T) {
 }
 
 func TestLookupInvalidDsRrsig(t *testing.T) {
-	resolver, err := NewResolver("./testdata/resolv.conf")
+	resolver, _ := NewResolver("./testdata/resolv.conf")
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("stakey.org.")
@@ -224,7 +224,7 @@ func TestLookupInvalidDsRrsig(t *testing.T) {
 }
 
 func TestLookupInvalidARRSIG(t *testing.T) {
-	resolver, err := NewResolver("./testdata/resolv.conf")
+	resolver, _ := NewResolver("./testdata/resolv.conf")
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("stakey.org.")
@@ -237,7 +237,7 @@ func TestLookupInvalidARRSIG(t *testing.T) {
 }
 
 func TestLookupInvalidAAAARRSIG(t *testing.T) {
-	resolver, err := NewResolver("./testdata/resolv.conf")
+	resolver, _ := NewResolver("./testdata/resolv.conf")
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("stakey.org.")
@@ -250,7 +250,7 @@ func TestLookupInvalidAAAARRSIG(t *testing.T) {
 }
 
 func TestLookupInvalidDnskeyRrsig(t *testing.T) {
-	resolver, err := NewResolver("./testdata/resolv.conf")
+	resolver, _ := NewResolver("./testdata/resolv.conf")
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("stakey.org.")
@@ -263,7 +263,7 @@ func TestLookupInvalidDnskeyRrsig(t *testing.T) {
 }
 
 func TestLookupMissingDnskey(t *testing.T) {
-	resolver, err := NewResolver("./testdata/resolv.conf")
+	resolver, _ := NewResolver("./testdata/resolv.conf")
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("stakey.org.")
@@ -276,7 +276,7 @@ func TestLookupMissingDnskey(t *testing.T) {
 }
 
 func TestLookupMissingDnskey2(t *testing.T) {
-	resolver, err := NewResolver("./testdata/resolv.conf")
+	resolver, _ := NewResolver("./testdata/resolv.conf")
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("dnssec-failed.org.")

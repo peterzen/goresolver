@@ -40,7 +40,7 @@ func (z SignedZone) validateRRSIG(sig *dns.RRSIG, rrSet []dns.RR) (err error) {
 		return err
 	}
 
-	if sig.ValidityPeriod(time.Now()) == false {
+	if !sig.ValidityPeriod(time.Now()) {
 		log.Printf("invalid validity period on signature: %s\n", err)
 		return ErrRrsigValidityPeriod
 	}

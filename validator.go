@@ -19,10 +19,7 @@ type SignedRRSet struct {
 }
 
 func (sRRset *SignedRRSet) IsSigned() bool {
-	if sRRset.rrSig == nil {
-		return false
-	}
-	return true
+	return sRRset.rrSig != nil
 }
 
 type ChainOfTrust struct {
@@ -193,17 +190,17 @@ func (res *Resolver) populateChainOfTrust(hostname string) (*ChainOfTrust, error
 
 	// TODO this should be a fatal error is DNSSEC validation
 	// isn't set to strict mode
-	if chainOfTrust.a.IsSigned() == false && chainOfTrust.aaaa.IsSigned() == false {
+	if !chainOfTrust.a.IsSigned() && !chainOfTrust.aaaa.IsSigned() {
 		return chainOfTrust, ErrResourceNotSigned
 	}
 
 	var signerName string
 
-	if chainOfTrust.a.IsSigned() == true {
+	if chainOfTrust.a.IsSigned() {
 		signerName = chainOfTrust.a.rrSig.SignerName
 	}
 
-	if chainOfTrust.aaaa.IsSigned() == true {
+	if chainOfTrust.aaaa.IsSigned() {
 		signerName = chainOfTrust.aaaa.rrSig.SignerName
 	}
 

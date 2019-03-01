@@ -15,13 +15,8 @@ func (res *Resolver) LookupIP(qname string) (ips []net.IP, err error) {
 	chainOfTrust, err := res.populateChainOfTrust(qname)
 
 	if err == ErrRRnotAvailable {
-		return make([]net.IP, 0, 0), ErrRRnotAvailable
+		return make([]net.IP, 0), ErrRRnotAvailable
 	}
-
-	//if chainOfTrust == nil {
-	//	log.Printf("no results: %s\n", err)
-	//	return nil,nil
-	//}
 
 	if err == ErrResourceNotSigned {
 		return formatResultRRs(chainOfTrust), ErrResourceNotSigned
