@@ -12,7 +12,7 @@ func TestSetClientConfig(t *testing.T) {
 }
 
 func TestDnsMessageInit(t *testing.T) {
-	msg := dnsMessageInit()
+	msg := NewDnsMessage()
 	opt := msg.IsEdns0()
 	if opt.Do() != true {
 		t.Logf("DO bit not enabled")
@@ -27,10 +27,10 @@ func TestPopulateChainOfTrust(t *testing.T) {
 	//	DisablePointerAddresses: true,
 	//}
 	//resolver, err := NewResolver("./testdata/resolv.conf")
-	//chainOfTrust, err := resolver.populateChainOfTrust("testnet-seed.decred.org.")
+	//chainOfTrust, err := resolver.Populate("testnet-seed.decred.org.")
 	//
 	//if err != nil || chainOfTrust == nil {
-	//	t.Error("populateChainOfTrust unexpected return value")
+	//	t.Error("Populate unexpected return value")
 	//}
 	//fmt.Printf("%#v", chainOfTrust)
 	//m,err:=json.Marshal(chainOfTrust)

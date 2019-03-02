@@ -8,39 +8,41 @@ import (
 )
 
 type SignedZone struct {
-	zone        string
-	dnskey      *SignedRRSet
-	ds          *SignedRRSet
-	parentZone  *SignedZone
-	signingKeys map[uint16]*dns.DNSKEY
+	zone         string
+	dnskey       *SignedRRSet
+	ds           *SignedRRSet
+	parentZone   *SignedZone
+	pubKeyLookup map[uint16]*dns.DNSKEY
 }
 
-func (z SignedZone) getKeyByTag(keyTag uint16) *dns.DNSKEY {
-	return z.signingKeys[keyTag]
+func (z SignedZone) lookupPubKey(keyTag uint16) *dns.DNSKEY {
+	return z.pubKeyLookup[keyTag]
 }
 
-func (z SignedZone) addSigningKey(k *dns.DNSKEY) {
-	z.signingKeys[k.KeyTag()] = k
+func (z SignedZone) addPubKey(k *dns.DNSKEY) {
+	z.pubKeyLookup[k.KeyTag()] = k
 }
 
-func (z SignedZone) verifyRRSIG(sig *dns.RRSIG, rrSet []dns.RR) (err error) {
-	if sig == nil {
+func (z SignedZone) verifyRRSIG(signedRRset *SignedRRSet) (err error) {
+
+	if !signedRRset.IsSigned() {
 		return ErrInvalidRRsig
 	}
+
 	// Verify the RRSIG of the DNSKEY RRset
-	key := z.getKeyByTag(sig.KeyTag)
+	key := z.lookupPubKey(signedRRset.rrSig.KeyTag)
 	if key == nil {
-		log.Printf("DNSKEY keytag %d not found", sig.KeyTag)
+		log.Printf("DNSKEY keytag %d not found", signedRRset.rrSig.KeyTag)
 		return ErrDnskeyNotAvailable
 	}
-	err = sig.Verify(key, rrSet)
 
+	err = signedRRset.rrSig.Verify(key, signedRRset.rrSet)
 	if err != nil {
 		log.Println("DNSKEY verification", err)
 		return err
 	}
 
-	if !sig.ValidityPeriod(time.Now()) {
+	if !signedRRset.rrSig.ValidityPeriod(time.Now()) {
 		log.Println("invalid validity period", err)
 		return ErrRrsigValidityPeriod
 	}
@@ -59,7 +61,7 @@ func (z SignedZone) verifyDS(dsRrset []dns.RR) (err error) {
 		}
 
 		parentDsDigest := strings.ToUpper(ds.Digest)
-		key := z.getKeyByTag(ds.KeyTag)
+		key := z.lookupPubKey(ds.KeyTag)
 		if key == nil {
 			log.Printf("DNSKEY keytag %d not found", ds.KeyTag)
 			return ErrDnskeyNotAvailable
@@ -75,9 +77,14 @@ func (z SignedZone) verifyDS(dsRrset []dns.RR) (err error) {
 	return ErrUnknownDsDigestType
 }
 
-func (z *SignedZone) checkDnskeys() (bool, error) {
-	if len(z.dnskey.rrSet) < 2 {
-		return false, ErrDnskeyNotAvailable
+func (z *SignedZone) checkHasDnskeys() bool {
+	return len(z.dnskey.rrSet) > 1
+}
+
+func NewSignedZone(domainName string) *SignedZone {
+	return &SignedZone{
+		zone:   domainName,
+		ds:     &SignedRRSet{},
+		dnskey: &SignedRRSet{},
 	}
-	return true, nil
 }

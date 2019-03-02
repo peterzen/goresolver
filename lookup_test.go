@@ -10,7 +10,6 @@ import (
 	"testing"
 )
 
-var testName = "test1"
 var isMockQuery = true
 var isMockUpdate = false
 
@@ -20,12 +19,12 @@ func getMockFile(testName string, qname string, qtype uint16) (fileName string, 
 	return fileName, baseDir
 }
 
-func mockQueryUpdate(qname string, qtype uint16) (*dns.Msg, error) {
+func mockQueryUpdate(t *testing.T, qname string, qtype uint16) (*dns.Msg, error) {
 	r, err := localQuery(qname, qtype)
 	if r == nil {
 		return nil, err
 	}
-	mockFile, mockDir := getMockFile(testName, qname, qtype)
+	mockFile, mockDir := getMockFile(t.Name(), qname, qtype)
 	if _, err := os.Stat(mockDir); os.IsNotExist(err) {
 		os.Mkdir(mockDir, 0755)
 	}
@@ -43,12 +42,13 @@ func mockQueryUpdate(qname string, qtype uint16) (*dns.Msg, error) {
 
 func newResolver(t *testing.T) (res *Resolver) {
 	resolver, _ := NewResolver("./testdata/resolv.conf")
-	resolver.query = func(qname string, qtype uint16) (*dns.Msg, error) {
+	resolver.queryFn = func(qname string, qtype uint16) (*dns.Msg, error) {
+		msg := &dns.Msg{}
 		if isMockQuery == false {
 			return localQuery(qname, qtype)
 		}
 		if isMockUpdate == true {
-			return mockQueryUpdate(qname, qtype)
+			return mockQueryUpdate(t, qname, qtype)
 		}
 		mockFile, _ := getMockFile(t.Name(), qname, qtype)
 		s, err := ioutil.ReadFile(mockFile)
@@ -56,18 +56,24 @@ func newResolver(t *testing.T) (res *Resolver) {
 			t.Error("mockQuery", err)
 		}
 		if s == nil {
-			t.Error("mockQuery: no result for ", mockFile)
+			t.Log("mockQuery: no result for ", mockFile)
+			return &dns.Msg{}, nil
 		}
 		ss := strings.Split(string(s), "\n")
 		rrSet := make([]dns.RR, 0, len(ss))
 		for _, rrStr := range ss {
+			if rrStr == "" {
+				continue
+			}
 			rr, err := dns.NewRR(rrStr)
 			if err != nil {
 				t.Error("mockQuery", err)
 			}
 			rrSet = append(rrSet, rr)
 		}
-		msg := &dns.Msg{Answer: rrSet}
+		if len(rrSet) > 0 {
+			msg.Answer = rrSet
+		}
 		return msg, nil
 	}
 	return resolver
@@ -90,7 +96,7 @@ func TestInitialize(t *testing.T) {
 //func TestLookupInvalid1(t *testing.T) {
 //	resolver, _ := NewResolver("./testdata/resolv.conf")
 //	testName = t.Name()
-//	//resolver.query = mockQuery
+//	//resolver.queryFn = mockQuery
 //	ips, err := resolver.LookupIP("sigfail.verteiltesysteme.net.")
 //	if err == nil {
 //		t.Errorf("dnssec validation failed: %v", err)
@@ -103,8 +109,8 @@ func TestInitialize(t *testing.T) {
 func TestLookupMissingResource(t *testing.T) {
 	resolver := newResolver(t)
 	ips, err := resolver.LookupIP("invalid.stakey.org.")
-	if err != ErrRRnotAvailable {
-		t.Errorf("should return ErrRRnotAvailable")
+	if err != ErrNoResult {
+		t.Errorf("should return ErrNoResult")
 	}
 	if len(ips) > 0 {
 		t.Error("lookup should return no results")
@@ -146,7 +152,7 @@ func TestLookupValid2(t *testing.T) {
 
 func TestLookupResourceNotSigned(t *testing.T) {
 	resolver := newResolver(t)
-	ips, err := resolver.LookupIP("google.com.")
+	ips, err := resolver.LookupIPv4("google.com.")
 	if err != ErrResourceNotSigned {
 		t.Errorf("should return ErrResourceNotSigned")
 	}
@@ -179,7 +185,7 @@ func TestLookupValid5(t *testing.T) {
 
 func TestLookupInvalidDsDigest(t *testing.T) {
 	resolver := newResolver(t)
-	ips, err := resolver.LookupIP("testnet-seed.stakey.org.")
+	ips, err := resolver.LookupIPv4("testnet-seed.stakey.org.")
 	if err != ErrDsInvalid {
 		t.Errorf("should return ErrDsInvalid")
 	}
@@ -190,7 +196,7 @@ func TestLookupInvalidDsDigest(t *testing.T) {
 
 func TestLookupInvalidDsRrsig(t *testing.T) {
 	resolver := newResolver(t)
-	ips, err := resolver.LookupIP("stakey.org.")
+	ips, err := resolver.LookupIPv4("stakey.org.")
 	if err != ErrRrsigValidationError {
 		t.Error("should return ErrRrsigValidationError")
 	}
@@ -201,7 +207,7 @@ func TestLookupInvalidDsRrsig(t *testing.T) {
 
 func TestLookupInvalidARRSIG(t *testing.T) {
 	resolver := newResolver(t)
-	ips, err := resolver.LookupIP("stakey.org.")
+	ips, err := resolver.LookupIPv4("stakey.org.")
 	if err != ErrInvalidRRsig {
 		t.Error("should return ErrRrsigValidationError")
 	}
@@ -212,7 +218,7 @@ func TestLookupInvalidARRSIG(t *testing.T) {
 
 func TestLookupInvalidAAAARRSIG(t *testing.T) {
 	resolver := newResolver(t)
-	ips, err := resolver.LookupIP("stakey.org.")
+	ips, err := resolver.LookupIPv6("stakey.org.")
 	if err != ErrInvalidRRsig {
 		t.Error("should return ErrRrsigValidationError")
 	}
@@ -223,7 +229,7 @@ func TestLookupInvalidAAAARRSIG(t *testing.T) {
 
 func TestLookupInvalidDnskeyRrsig(t *testing.T) {
 	resolver := newResolver(t)
-	ips, err := resolver.LookupIP("stakey.org.")
+	ips, err := resolver.LookupIPv4("stakey.org.")
 	if err != ErrRrsigValidationError {
 		t.Error("should return ErrRrsigValidationError")
 	}
@@ -234,12 +240,34 @@ func TestLookupInvalidDnskeyRrsig(t *testing.T) {
 
 func TestLookupMissingDnskey(t *testing.T) {
 	resolver := newResolver(t)
-	ips, err := resolver.LookupIP("stakey.org.")
+	ips, err := resolver.LookupIPv4("stakey.org.")
 	if err != ErrDnskeyNotAvailable {
 		t.Error("should return ErrDnskeyNotAvailable")
 	}
 	if len(ips) > 0 {
 		t.Error("lookup returned no results")
+	}
+}
+
+func TestStrictNSQuery(t *testing.T) {
+	resolver := newResolver(t)
+	rrs, err := resolver.StrictNSQuery("bortzmeyer.org.", dns.TypeTXT)
+	if err != nil {
+		t.Error("err should be nil")
+	}
+	if len(rrs) != 2 {
+		t.Error("should return RRs")
+	}
+}
+
+func TestNonexistentName(t *testing.T) {
+	resolver := newResolver(t)
+	rrs, err := resolver.StrictNSQuery("non-existent-domain-34545345.org.", dns.TypeTXT)
+	if err != ErrNoResult {
+		t.Error("should return ErrNoResult")
+	}
+	if len(rrs) > 0 {
+		t.Error("should not return results")
 	}
 }
 

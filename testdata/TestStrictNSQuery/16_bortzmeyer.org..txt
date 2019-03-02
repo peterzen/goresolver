@@ -1,0 +1,3 @@
+bortzmeyer.org.	10512	IN	TXT	"My personal domain - Domaine personnel"
+bortzmeyer.org.	10512	IN	TXT	"v=spf1 mx ?all"
+bortzmeyer.org.	10512	IN	RRSIG	TXT 8 2 86400 20190310044041 20190223161507 16041 bortzmeyer.org. kgsB7SsfmUxR9HiHz0AqLVrfKJTn+jd+1Pp+btb6L9m8ljjSsAZMo+JMPXkh7swuSf5gIQHUQGCAC8gJcZVpc6lMYY93mI5+8mPFudwv+30YD//UxD4PYQ5Db8TkbGl5dETrzPkY1UVv41ULXEXEW7uZCC7mfVRY8B3kTAfOdLk=
