@@ -9,8 +9,9 @@ import (
 
 type SignedZone struct {
 	zone        string
-	dnskey      SignedRRSet
-	ds          SignedRRSet
+	dnskey      *SignedRRSet
+	ds          *SignedRRSet
+	parentZone  *SignedZone
 	signingKeys map[uint16]*dns.DNSKEY
 }
 
@@ -72,4 +73,11 @@ func (z SignedZone) verifyDS(dsRrset []dns.RR) (err error) {
 		return ErrDsInvalid
 	}
 	return ErrUnknownDsDigestType
+}
+
+func (z *SignedZone) checkDnskeys() (bool, error) {
+	if len(z.dnskey.rrSet) < 2 {
+		return false, ErrDnskeyNotAvailable
+	}
+	return true, nil
 }

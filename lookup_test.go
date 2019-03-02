@@ -267,8 +267,8 @@ func TestLookupMissingDnskey(t *testing.T) {
 	testName = t.Name()
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("stakey.org.")
-	if err != ErrRrsigValidationError {
-		t.Error("should return ErrRrsigValidationError")
+	if err != ErrDnskeyNotAvailable {
+		t.Error("should return ErrDnskeyNotAvailable")
 	}
 	if len(ips) > 0 {
 		t.Error("lookup returned no results")

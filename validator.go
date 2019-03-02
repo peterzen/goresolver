@@ -84,8 +84,8 @@ func queryDelegation(domainName string) (signedZone *SignedZone, err error) {
 
 	signedZone = &SignedZone{
 		zone:   domainName,
-		ds:     SignedRRSet{},
-		dnskey: SignedRRSet{},
+		ds:     &SignedRRSet{},
+		dnskey: &SignedRRSet{},
 	}
 
 	// get DS record
@@ -237,6 +237,11 @@ func verifyChainOfTrust(chainOfTrust *ChainOfTrust) (err error) {
 	}
 
 	signedZone := chainOfTrust.delegationChain[0]
+
+	hasKeys, err := signedZone.checkDnskeys()
+	if !hasKeys {
+		return err
+	}
 
 	// Verify the RRSIG of the requested RRset with the public ZSK.
 	if len(chainOfTrust.a.rrSet) > 0 {
