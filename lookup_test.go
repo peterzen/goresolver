@@ -281,7 +281,7 @@ func TestLookupMissingDnskey2(t *testing.T) {
 	resolver.query = mockQuery
 	ips, err := resolver.LookupIP("dnssec-failed.org.")
 	if err == ErrDnskeyNotAvailable {
-		t.Error("validation should fail")
+		t.Error("validation should return ErrDnskeyNotAvailable")
 	}
 	if len(ips) > 0 {
 		t.Error("lookup returned no results")

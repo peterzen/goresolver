@@ -27,7 +27,7 @@ func (res *Resolver) LookupIP(qname string) (ips []net.IP, err error) {
 		return nil, err
 	}
 
-	err = validateChainOfTrust(chainOfTrust)
+	err = verifyChainOfTrust(chainOfTrust)
 	if err != nil {
 		log.Printf("DNSSEC validation failed: %s\n", err)
 		return nil, err

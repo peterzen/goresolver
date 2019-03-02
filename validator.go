@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	DefaultTimeout time.Duration = 5 * time.Second
+	DefaultTimeout = 5 * time.Second
 )
 
 type SignedRRSet struct {
@@ -29,7 +29,6 @@ type ChainOfTrust struct {
 }
 
 type Resolver struct {
-	clientConfig    dns.ClientConfig
 	query           func(string, uint16) (*dns.Msg, error)
 	dnsClient       *dns.Client
 	dnsClientConfig *dns.ClientConfig
@@ -188,8 +187,8 @@ func (res *Resolver) populateChainOfTrust(hostname string) (*ChainOfTrust, error
 		return chainOfTrust, ErrRRnotAvailable
 	}
 
-	// TODO this should be a fatal error is DNSSEC validation
-	// isn't set to strict mode
+	// TODO this should be a fatal error if DNSSEC validation
+	// is set to strict mode
 	if !chainOfTrust.a.IsSigned() && !chainOfTrust.aaaa.IsSigned() {
 		return chainOfTrust, ErrResourceNotSigned
 	}
@@ -230,8 +229,8 @@ func (res *Resolver) populateChainOfTrust(hostname string) (*ChainOfTrust, error
 	return chainOfTrust, nil
 }
 
-// DNSSEC chain of trust validation
-func validateChainOfTrust(chainOfTrust *ChainOfTrust) (err error) {
+// DNSSEC chain of trust verification
+func verifyChainOfTrust(chainOfTrust *ChainOfTrust) (err error) {
 
 	if chainOfTrust.delegationChain == nil {
 		return ErrDnskeyNotAvailable
@@ -241,7 +240,7 @@ func validateChainOfTrust(chainOfTrust *ChainOfTrust) (err error) {
 
 	// Verify the RRSIG of the requested RRset with the public ZSK.
 	if len(chainOfTrust.a.rrSet) > 0 {
-		err := signedZone.validateRRSIG(chainOfTrust.a.rrSig, chainOfTrust.a.rrSet)
+		err := signedZone.verifyRRSIG(chainOfTrust.a.rrSig, chainOfTrust.a.rrSet)
 		if err != nil {
 			fmt.Printf("validation A: %s\n", err)
 			return ErrInvalidRRsig
@@ -249,7 +248,7 @@ func validateChainOfTrust(chainOfTrust *ChainOfTrust) (err error) {
 	}
 
 	if len(chainOfTrust.aaaa.rrSet) > 0 {
-		err := signedZone.validateRRSIG(chainOfTrust.aaaa.rrSig, chainOfTrust.aaaa.rrSet)
+		err := signedZone.verifyRRSIG(chainOfTrust.aaaa.rrSig, chainOfTrust.aaaa.rrSet)
 		if err != nil {
 			fmt.Printf("validation AAAA: %s\n", err)
 			return ErrInvalidRRsig
@@ -264,7 +263,7 @@ func validateChainOfTrust(chainOfTrust *ChainOfTrust) (err error) {
 		}
 
 		// Verify the RRSIG of the DNSKEY RRset with the public KSK.
-		err := signedZone.validateRRSIG(signedZone.dnskey.rrSig, signedZone.dnskey.rrSet)
+		err := signedZone.verifyRRSIG(signedZone.dnskey.rrSig, signedZone.dnskey.rrSet)
 
 		if err != nil {
 			log.Printf("validation DNSKEY: %s\n", err)
@@ -277,14 +276,14 @@ func validateChainOfTrust(chainOfTrust *ChainOfTrust) (err error) {
 		}
 
 		if signedZone.parentZone != nil {
-			err := signedZone.parentZone.validateRRSIG(signedZone.ds.rrSig, signedZone.ds.rrSet)
+			err := signedZone.parentZone.verifyRRSIG(signedZone.ds.rrSig, signedZone.ds.rrSet)
 			if err != nil {
 				log.Printf("DS on %s doesn't validate against RRSIG %d\n", signedZone.zone, signedZone.ds.rrSig.KeyTag)
 				return ErrRrsigValidationError
 			}
 		}
 
-		err = signedZone.validateDS(signedZone.ds.rrSet)
+		err = signedZone.verifyDS(signedZone.ds.rrSet)
 		if err != nil {
 			log.Printf("DS does not validate: %s", err)
 			return ErrDsInvalid

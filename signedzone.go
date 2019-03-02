@@ -12,7 +12,6 @@ type SignedZone struct {
 	dnskey      SignedRRSet
 	ds          SignedRRSet
 	signingKeys map[uint16]*dns.DNSKEY
-	parentZone  *SignedZone
 }
 
 func (z SignedZone) getKeyByTag(keyTag uint16) *dns.DNSKEY {
@@ -23,7 +22,7 @@ func (z SignedZone) addSigningKey(k *dns.DNSKEY) {
 	z.signingKeys[k.KeyTag()] = k
 }
 
-func (z SignedZone) validateRRSIG(sig *dns.RRSIG, rrSet []dns.RR) (err error) {
+func (z SignedZone) verifyRRSIG(sig *dns.RRSIG, rrSet []dns.RR) (err error) {
 	if sig == nil {
 		return ErrInvalidRRsig
 	}
@@ -36,18 +35,18 @@ func (z SignedZone) validateRRSIG(sig *dns.RRSIG, rrSet []dns.RR) (err error) {
 	err = sig.Verify(key, rrSet)
 
 	if err != nil {
-		log.Printf("validation DNSKEY: %s\n", err)
+		log.Println("DNSKEY verification", err)
 		return err
 	}
 
 	if !sig.ValidityPeriod(time.Now()) {
-		log.Printf("invalid validity period on signature: %s\n", err)
+		log.Println("invalid validity period", err)
 		return ErrRrsigValidityPeriod
 	}
 	return nil
 }
 
-func (z SignedZone) validateDS(dsRrset []dns.RR) (err error) {
+func (z SignedZone) verifyDS(dsRrset []dns.RR) (err error) {
 
 	for _, rr := range dsRrset {
 
