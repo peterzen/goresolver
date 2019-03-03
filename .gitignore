@@ -14,4 +14,6 @@
 *.out
 
 .idea/workspace.xml
-cmd/lookup/lookup
+examples/lookup/lookup
+/examples/lookup/lookup
+/examples/mxlookup/mxlookup
