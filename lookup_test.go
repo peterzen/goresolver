@@ -271,6 +271,17 @@ func TestNonexistentName(t *testing.T) {
 	}
 }
 
+func TestOnlyZskPresent(t *testing.T) {
+	resolver := newResolver(t)
+	rrs, err := resolver.StrictNSQuery("froggle.org.", dns.TypeMX)
+	if err != nil {
+		t.Error("should not return err")
+	}
+	if len(rrs) < 7 {
+		t.Error("should return results")
+	}
+}
+
 //func TestLookupMissingDnskey2(t *testing.T) {
 //	resolver := newResolver(t)
 //	ips, err := resolver.LookupIP("dnssec-failed.org.")

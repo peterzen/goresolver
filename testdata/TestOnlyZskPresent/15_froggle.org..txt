@@ -1,0 +1,8 @@
+froggle.org.	10583	IN	MX	10 aspmx3.googlemail.com.
+froggle.org.	10583	IN	MX	10 aspmx4.googlemail.com.
+froggle.org.	10583	IN	MX	10 aspmx5.googlemail.com.
+froggle.org.	10583	IN	MX	1 aspmx.l.google.com.
+froggle.org.	10583	IN	MX	5 alt1.aspmx.l.google.com.
+froggle.org.	10583	IN	MX	5 alt2.aspmx.l.google.com.
+froggle.org.	10583	IN	MX	10 aspmx2.googlemail.com.
+froggle.org.	10583	IN	RRSIG	MX 13 2 2592000 20190314000000 20190221000000 51193 froggle.org. 4QnfJv6ErDMvDyRBm2cFvV5uzxsmffOMqQnGXaMQo24CtjQCQ5KaoFflsl0fZ2NlbnAnKqOwWWgYDfnzqAZKwA==

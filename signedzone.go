@@ -78,7 +78,7 @@ func (z SignedZone) verifyDS(dsRrset []dns.RR) (err error) {
 }
 
 func (z *SignedZone) checkHasDnskeys() bool {
-	return len(z.dnskey.rrSet) > 1
+	return len(z.dnskey.rrSet) > 0
 }
 
 func NewSignedZone(domainName string) *SignedZone {
