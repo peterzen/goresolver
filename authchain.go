@@ -13,6 +13,8 @@ type AuthenticationChain struct {
 
 func (authChain *AuthenticationChain) Populate(domainName string) error {
 
+	authChain.zone = domainName
+
 	qnameComponents := strings.Split(domainName, ".")
 	// TODO make this verify all the way up to the root zone
 	zonesToVerify := len(qnameComponents) - 1
