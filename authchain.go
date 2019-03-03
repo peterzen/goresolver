@@ -41,10 +41,6 @@ func (authChain *AuthenticationChain) Populate(domainName string) error {
 // DNSSEC chain of trust verification
 func (authChain *AuthenticationChain) Verify(answerRRset *SignedRRSet) error {
 
-	if authChain.delegationChain == nil {
-		return ErrDnskeyNotAvailable
-	}
-
 	signedZone := authChain.delegationChain[0]
 	if !signedZone.checkHasDnskeys() {
 		return ErrDnskeyNotAvailable
