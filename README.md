@@ -4,7 +4,9 @@ go-resolver
 A Golang DNSSEC validating resolver library implemented on top of [miekg/dns](https://github.com/miekg/dns).
 
 
-This package implements DNS lookup functions compatible with [net.LookupIP](https://golang.org/pkg/net/#LookupIP).  When querying DNSSEC enabled zones, it performs a full validation of the resource records (RRs) included in the response:
+This package implements DNS lookup functions that perform DNSSEC validation.  
+
+When querying DNSSEC enabled zones, it performs a full verification of the resource records (RRs) included in the response and validates the chain of trust:
 
 * Requests the desired RRset (along with the corresponding `RRSIG` record)
 * Requests the `DNSKEY` records containing the public ZSK and public KSK (along with the `RRSIG` for the `DNSKEY` RRset)
@@ -19,6 +21,16 @@ In case of any validation errors, the method return a non-nil `err` value, and a
  
 ## Documentation
 
+```Go
+import "github.com/peterzen/goresolver"
+
+result, err := resolver.StrictNSQuery("example.com.", dns.TypeMX)
+
+if err != nil {
+	// handle validation errors
+}
+```
+`goresolver.LookupIP` can be used as drop-in replacement to [net.LookupIP](https://golang.org/pkg/net/#LookupIP):
 
 ```Go
 import "github.com/peterzen/goresolver"
@@ -30,7 +42,6 @@ if err != nil {
 }
 ```
 
-
 ## Installation
 
 ```bash
@@ -40,3 +51,5 @@ $ go get -u github.com/peterzen/goresolver
 ## Test coverage
 
 See [test-coverage.txt](test-coverage.txt)
+
+PRs for additional test cases covering less common DNSSEC setups are welcome and much appreciated.
