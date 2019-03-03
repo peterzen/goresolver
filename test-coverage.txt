@@ -1,17 +1,26 @@
-
-github.com/peterzen/goresolver/lookup.go	 formatResultRRs		 100.00% (8/8)
-github.com/peterzen/goresolver/validator.go	 NewResolver			 100.00% (7/7)
-github.com/peterzen/goresolver/validator.go	 dnsMessageInit			 100.00% (3/3)
-github.com/peterzen/goresolver/validator.go	 SignedRRSet.IsSigned		 100.00% (3/3)
-github.com/peterzen/goresolver/signedzone.go	 SignedZone.addSigningKey	 100.00% (1/1)
-github.com/peterzen/goresolver/signedzone.go	 SignedZone.getKeyByTag		 100.00% (1/1)
-github.com/peterzen/goresolver/lookup.go	 Resolver.LookupIP		 93.33% (14/15)
-github.com/peterzen/goresolver/validator.go	 Resolver.populateChainOfTrust	 91.11% (41/45)
-github.com/peterzen/goresolver/validator.go	 validateChainOfTrust		 85.29% (29/34)
-github.com/peterzen/goresolver/signedzone.go	 SignedZone.validateDS		 81.25% (13/16)
-github.com/peterzen/goresolver/signedzone.go	 SignedZone.validateRRSIG	 78.57% (11/14)
-github.com/peterzen/goresolver/validator.go	 queryDelegation		 74.07% (20/27)
-github.com/peterzen/goresolver/validator.go	 localQuery			 0.00% (0/11)
-github.com/peterzen/goresolver			 -----------------------------	 81.62% (151/185)
-
-Total Coverage: 81.62% (151/185)
+github.com/peterzen/goresolver/authchain.go:14:		Populate		92.9%
+github.com/peterzen/goresolver/authchain.go:42:		Verify			85.7%
+github.com/peterzen/goresolver/authchain.go:91:		NewChainOfTrust		100.0%
+github.com/peterzen/goresolver/goresolver.go:35:	NewDnsMessage		100.0%
+github.com/peterzen/goresolver/goresolver.go:45:	localQuery		0.0%
+github.com/peterzen/goresolver/goresolver.go:65:	queryDelegation		100.0%
+github.com/peterzen/goresolver/goresolver.go:83:	getAnswers		0.0%
+github.com/peterzen/goresolver/goresolver.go:105:	NewResolver		100.0%
+github.com/peterzen/goresolver/lookup.go:11:		LookupIP		81.8%
+github.com/peterzen/goresolver/lookup.go:66:		LookupIPv4		100.0%
+github.com/peterzen/goresolver/lookup.go:70:		LookupIPv6		100.0%
+github.com/peterzen/goresolver/lookup.go:74:		LookupIPType		80.0%
+github.com/peterzen/goresolver/lookup.go:110:		StrictNSQuery		68.4%
+github.com/peterzen/goresolver/lookup.go:147:		formatResultRRs		100.0%
+github.com/peterzen/goresolver/signedrrset.go:13:	querySignedRRset	76.5%
+github.com/peterzen/goresolver/signedrrset.go:47:	IsSigned		100.0%
+github.com/peterzen/goresolver/signedrrset.go:51:	IsEmpty			100.0%
+github.com/peterzen/goresolver/signedrrset.go:55:	SignerName		100.0%
+github.com/peterzen/goresolver/signedrrset.go:59:	NewSignedRRSet		100.0%
+github.com/peterzen/goresolver/signedzone.go:18:	lookupPubKey		100.0%
+github.com/peterzen/goresolver/signedzone.go:22:	addPubKey		100.0%
+github.com/peterzen/goresolver/signedzone.go:26:	verifyRRSIG		78.6%
+github.com/peterzen/goresolver/signedzone.go:52:	verifyDS		81.2%
+github.com/peterzen/goresolver/signedzone.go:80:	checkHasDnskeys		100.0%
+github.com/peterzen/goresolver/signedzone.go:84:	NewSignedZone		100.0%
+total:							(statements)		75.8%

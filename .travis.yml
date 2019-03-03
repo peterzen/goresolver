@@ -22,8 +22,8 @@ script:
     --enable=gosimple
     --enable=unconvert
     --deadline=4m ./spew | tee /dev/stderr)"
-  - go test -v -race -tags safe ./spew
-  - go test -v -race -tags testcgo ./spew -covermode=atomic -coverprofile=profile.cov
+  - go test -v -race -tags safe ./
+  - go test -v -race -tags testcgo ./ -covermode=atomic -coverprofile=profile.cov
 after_success:
   - go get -v github.com/mattn/goveralls
   - goveralls -coverprofile=profile.cov -service=travis-ci
