@@ -1,0 +1,2 @@
+dnssec-deployment.org.	112	IN	AAAA	2001:41c8:20::4001
+dnssec-deployment.org.	112	IN	RRSIG	AAAA 5 2 300 20190313204002 20190227204002 56982 dnssec-deployment.org. PisT1kAHx7Ak6rvLlfxsoXGYVmPcnhI4vrQCG7v872EXkiNWhNKB8jMMWUDNKkILzBlbIuVtWPDdl0GsIswWG35bOXprQoJwyf2cWXEi26w2vKFiIZ8eHE5xvFhrrvkcb3Sgksr/73cgrOt+WKfTJT+/6dmKSx/hlbzMl1sBces=

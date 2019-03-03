@@ -282,13 +282,13 @@ func TestOnlyZskPresent(t *testing.T) {
 	}
 }
 
-//func TestLookupMissingDnskey2(t *testing.T) {
-//	resolver := newResolver(t)
-//	ips, err := resolver.LookupIP("dnssec-failed.org.")
-//	if err == ErrDnskeyNotAvailable {
-//		t.Error("validation should return ErrDnskeyNotAvailable")
-//	}
-//	if len(ips) > 0 {
-//		t.Error("lookup returned no results")
-//	}
-//}
+func TestMissingDsRR(t *testing.T) {
+	resolver := newResolver(t)
+	ips, err := resolver.LookupIPv4("dnssec-deployment.org.")
+	if err != ErrDsNotAvailable {
+		t.Error("should return ErrDsNotAvailable")
+	}
+	if len(ips) > 0 {
+		t.Error("should return no results")
+	}
+}
