@@ -1,6 +1,10 @@
 go-resolver
 ===============
 
+[![Build Status](https://travis-ci.org/peterzen/goresolver.svg?branch=master)](https://travis-ci.org/peterzen/goresolver)
+[![ISC License](http://img.shields.io/badge/license-ISC-blue.svg)](http://copyfree.org)
+[![codecov](https://codecov.io/gh/peterzen/goresolver/branch/master/graph/badge.svg)](https://codecov.io/gh/peterzen/goresolver)
+
 A Golang DNSSEC validating resolver library implemented on top of [miekg/dns](https://github.com/miekg/dns).
 
 
@@ -47,9 +51,5 @@ if err != nil {
 ```bash
 $ go get -u github.com/peterzen/goresolver
 ```
-
-## Test coverage
-
-See [test-coverage.txt](test-coverage.txt)
 
 PRs for additional test cases covering less common DNSSEC setups are welcome and much appreciated.
