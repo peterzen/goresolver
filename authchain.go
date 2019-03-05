@@ -23,20 +23,17 @@ type AuthenticationChain struct {
 func (authChain *AuthenticationChain) Populate(domainName string) error {
 
 	qnameComponents := strings.Split(domainName, ".")
-	// TODO make this verify all the way up to the root zoneName
-	zonesToVerify := len(qnameComponents) - 1
-
+	zonesToVerify := len(qnameComponents)
+	// TODO add test case
 	if zonesToVerify < 0 {
 		zonesToVerify = 0
 	}
 
 	authChain.delegationChain = make([]SignedZone, 0, zonesToVerify)
-
 	for i := 0; i < zonesToVerify; i++ {
 		zoneName := dns.Fqdn(strings.Join(qnameComponents[i:], "."))
 		delegation, err := queryDelegation(zoneName)
 		if err != nil {
-			//log.Printf("zoneName queryFn failed: %v\n", err)
 			return err
 		}
 		if i > 0 {
@@ -81,23 +78,23 @@ func (authChain *AuthenticationChain) Verify(answerRRset *RRSet) error {
 			return ErrRrsigValidationError
 		}
 
-		if signedZone.ds.IsEmpty() {
-			log.Printf("DS RR is not available on zoneName %s\n", signedZone.zone)
-			return ErrDsNotAvailable
-		}
-
 		if signedZone.parentZone != nil {
+
+			if signedZone.ds.IsEmpty() {
+				log.Printf("DS RR is not available on zoneName %s\n", signedZone.zone)
+				return ErrDsNotAvailable
+			}
+
 			err := signedZone.parentZone.verifyRRSIG(signedZone.ds)
 			if err != nil {
 				log.Printf("DS on %s doesn't validate against RRSIG %d\n", signedZone.zone, signedZone.ds.rrSig.KeyTag)
 				return ErrRrsigValidationError
 			}
-		}
-
-		err = signedZone.verifyDS(signedZone.ds.rrSet)
-		if err != nil {
-			log.Printf("DS does not validate: %s", err)
-			return ErrDsInvalid
+			err = signedZone.verifyDS(signedZone.ds.rrSet)
+			if err != nil {
+				log.Printf("DS does not validate: %s", err)
+				return ErrDsInvalid
+			}
 		}
 	}
 	return nil

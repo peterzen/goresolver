@@ -119,7 +119,7 @@ func (resolver *Resolver) StrictNSQuery(qname string, qtype uint16) (rrSet []dns
 		return nil, err
 	}
 
-	if answer == nil {
+	if answer.IsEmpty() {
 		return nil, ErrNoResult
 	}
 

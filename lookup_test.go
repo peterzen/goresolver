@@ -131,22 +131,22 @@ func TestLookupValid1(t *testing.T) {
 	}
 }
 
-func TestLookupAAAAOnly(t *testing.T) {
+func TestLookupValid2(t *testing.T) {
 	resolver := newResolver(t)
-	ips, err := resolver.LookupIP("stakey.org.")
+	ips, err := resolver.LookupIP("testnet-seed.stakey.org.")
 	if err != nil {
-		t.Error("shouldn't return err")
+		t.Error("should validate")
 	}
 	if len(ips) < 1 {
 		t.Error("lookup should return results")
 	}
 }
 
-func TestLookupValid2(t *testing.T) {
+func TestLookupAAAAOnly(t *testing.T) {
 	resolver := newResolver(t)
-	ips, err := resolver.LookupIP("testnet-seed.stakey.org.")
+	ips, err := resolver.LookupIP("stakey.org.")
 	if err != nil {
-		t.Error("should validate")
+		t.Error("shouldn't return err")
 	}
 	if len(ips) < 1 {
 		t.Error("lookup should return results")

@@ -24,11 +24,12 @@ func queryRRset(qname string, qtype uint16) (*RRSet, error) {
 		return nil, ErrNoResult
 	}
 
+	result := NewSignedRRSet()
+
 	if r.Answer == nil {
-		return nil, ErrNoResult
+		return result, nil
 	}
 
-	result := NewSignedRRSet()
 	result.rrSet = make([]dns.RR, 0, len(r.Answer))
 
 	for _, rr := range r.Answer {

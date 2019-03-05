@@ -78,11 +78,6 @@ func queryDelegation(domainName string) (signedZone *SignedZone, err error) {
 
 	signedZone = NewSignedZone(domainName)
 
-	signedZone.ds, err = queryRRset(domainName, dns.TypeDS)
-	if err == ErrNoResult {
-		return nil, ErrDsNotAvailable
-	}
-
 	signedZone.dnskey, err = queryRRset(domainName, dns.TypeDNSKEY)
 	if err != nil {
 		return nil, err
@@ -91,6 +86,8 @@ func queryDelegation(domainName string) (signedZone *SignedZone, err error) {
 	for _, rr := range signedZone.dnskey.rrSet {
 		signedZone.addPubKey(rr.(*dns.DNSKEY))
 	}
+
+	signedZone.ds, _ = queryRRset(domainName, dns.TypeDS)
 
 	return signedZone, nil
 }
