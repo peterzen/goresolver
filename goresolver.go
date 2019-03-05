@@ -10,12 +10,16 @@ const (
 	DefaultTimeout = 5 * time.Second
 )
 
+// Resolver contains the client configuration for github.com/miekg/dns,
+// the instantiated client and the func that performs the actual queries.
+// queryFn can be used for mocking the actual DNS lookups in the test suite.
 type Resolver struct {
 	queryFn         func(string, uint16) (*dns.Msg, error)
 	dnsClient       *dns.Client
 	dnsClientConfig *dns.ClientConfig
 }
 
+// Errors returned by the verification/validation methods at all levels.
 var (
 	ErrResourceNotSigned    = errors.New("resource is not signed with RRSIG")
 	ErrNoResult             = errors.New("requested RR not found")
@@ -31,6 +35,9 @@ var (
 
 var resolver *Resolver
 
+// NewDNSMessage creates and initializes a dns.Msg object, with EDNS enabled
+// and the DO (DNSSEC OK) flag set.  It returns a pointer to the created
+// object.
 func NewDNSMessage() *dns.Msg {
 	dnsMessage := &dns.Msg{
 		MsgHdr: dns.MsgHdr{
@@ -41,6 +48,10 @@ func NewDNSMessage() *dns.Msg {
 	return dnsMessage
 }
 
+// localQuery takes a query name (qname) and query type (qtype) and
+// performs a DNS lookup by calling dnsClient.Exchange.
+// It returns the answer in a *dns.Msg (or nil in case of an error, in which
+// case err will be set accordingly.)
 func localQuery(qname string, qtype uint16) (*dns.Msg, error) {
 	dnsMessage := NewDNSMessage()
 	dnsMessage.SetQuestion(qname, qtype)
@@ -61,6 +72,8 @@ func localQuery(qname string, qtype uint16) (*dns.Msg, error) {
 	return nil, ErrNsNotAvailable
 }
 
+// queryDelegation takes a domain name and fetches the DS and DNSKEY records
+// in that zone.  Returns a SignedZone or nil in case of error.
 func queryDelegation(domainName string) (signedZone *SignedZone, err error) {
 
 	signedZone = NewSignedZone(domainName)
@@ -82,6 +95,8 @@ func queryDelegation(domainName string) (signedZone *SignedZone, err error) {
 	return signedZone, nil
 }
 
+// NewResolver initializes the package Resolver instance using the default
+// dnsClientConfig.
 func NewResolver(resolvConf string) (res *Resolver, err error) {
 	resolver = &Resolver{}
 	resolver.dnsClient = &dns.Client{

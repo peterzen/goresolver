@@ -6,17 +6,24 @@ import (
 	"strings"
 )
 
+// AuthenticationChain represents the DNSSEC chain of trust from the
+// queried zone to the root (.) zone.  In order for a zone to validate,
+// it is required that each zone in the chain validate against its
+// parent using the DS record.
+//
+// https://www.ietf.org/rfc/rfc4033.txt
 type AuthenticationChain struct {
-	zone            string
 	delegationChain []SignedZone
 }
 
+// Populate queries the RRs required for the zone validation
+// It begins the queries at the *domainName* zone and then walks
+// up the delegation tree all the way up to the root zone, thus
+// populating a linked list of SignedZone objects.
 func (authChain *AuthenticationChain) Populate(domainName string) error {
 
-	authChain.zone = domainName
-
 	qnameComponents := strings.Split(domainName, ".")
-	// TODO make this verify all the way up to the root zone
+	// TODO make this verify all the way up to the root zoneName
 	zonesToVerify := len(qnameComponents) - 1
 
 	if zonesToVerify < 0 {
@@ -29,7 +36,7 @@ func (authChain *AuthenticationChain) Populate(domainName string) error {
 		zoneName := dns.Fqdn(strings.Join(qnameComponents[i:], "."))
 		delegation, err := queryDelegation(zoneName)
 		if err != nil {
-			//log.Printf("zone queryFn failed: %v\n", err)
+			//log.Printf("zoneName queryFn failed: %v\n", err)
 			return err
 		}
 		if i > 0 {
@@ -40,7 +47,13 @@ func (authChain *AuthenticationChain) Populate(domainName string) error {
 	return nil
 }
 
-// DNSSEC chain of trust verification
+// Verify uses the zone data in delegationChain to validate the DNSSEC
+// chain of trust.
+// It starts the verification in the RRSet supplied as parameter (verifies
+// the RRSIG on the answer RRs), and, assuming a signature is correct and
+// valid, it walks through the delegationChain checking the RRSIGs on
+// the DNSKEY and DS resource record sets, as well as correctness of each
+// delegation using the lower level methods in SignedZone.
 func (authChain *AuthenticationChain) Verify(answerRRset *RRSet) error {
 
 	signedZone := authChain.delegationChain[0]
@@ -69,7 +82,7 @@ func (authChain *AuthenticationChain) Verify(answerRRset *RRSet) error {
 		}
 
 		if signedZone.ds.IsEmpty() {
-			log.Printf("DS RR is not available on zone %s\n", signedZone.zone)
+			log.Printf("DS RR is not available on zoneName %s\n", signedZone.zone)
 			return ErrDsNotAvailable
 		}
 
@@ -90,6 +103,8 @@ func (authChain *AuthenticationChain) Verify(answerRRset *RRSet) error {
 	return nil
 }
 
-func NewChainOfTrust() *AuthenticationChain {
+// NewAuthenticationChain initializes an AuthenticationChain object and
+// returns a reference to it.
+func NewAuthenticationChain() *AuthenticationChain {
 	return &AuthenticationChain{}
 }

@@ -4,6 +4,7 @@ go-resolver
 [![Build Status](https://travis-ci.org/peterzen/goresolver.svg?branch=master)](https://travis-ci.org/peterzen/goresolver)
 [![ISC License](http://img.shields.io/badge/license-ISC-blue.svg)](http://copyfree.org)
 [![codecov](https://codecov.io/gh/peterzen/goresolver/branch/master/graph/badge.svg)](https://codecov.io/gh/peterzen/goresolver)
+[![GoDoc](https://godoc.org/github.com/peterzen/goresolver?status.svg)](https://godoc.org/github.com/peterzen/goresolver)
 
 A Golang DNSSEC validating resolver library implemented on top of [miekg/dns](https://github.com/miekg/dns).
 

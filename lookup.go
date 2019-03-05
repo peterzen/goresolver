@@ -43,15 +43,15 @@ func (resolver *Resolver) LookupIP(qname string) (ips []net.IP, err error) {
 	}
 
 	signerName := answers[0].SignerName()
-	chainOfTrust := NewChainOfTrust()
-	err = chainOfTrust.Populate(signerName)
+	authChain := NewAuthenticationChain()
+	err = authChain.Populate(signerName)
 	if err != nil {
 		log.Printf("Cannot populate authentication chain: %s\n", err)
 		return nil, err
 	}
 	resultIPs := make([]net.IP, MaxReturnedIPAddressesCount)
 	for _, answer := range answers {
-		err = chainOfTrust.Verify(answer)
+		err = authChain.Verify(answer)
 		if err != nil {
 			log.Printf("DNSSEC validation failed: %s\n", err)
 			continue
@@ -92,7 +92,7 @@ func (resolver *Resolver) LookupIPType(qname string, qtype uint16) (ips []net.IP
 	}
 
 	signerName := answer.SignerName()
-	authChain := NewChainOfTrust()
+	authChain := NewAuthenticationChain()
 	err = authChain.Populate(signerName)
 	if err != nil {
 		log.Printf("Cannot populate authentication chain: %s\n", err)
@@ -129,14 +129,14 @@ func (resolver *Resolver) StrictNSQuery(qname string, qtype uint16) (rrSet []dns
 
 	signerName := answer.SignerName()
 
-	chainOfTrust := NewChainOfTrust()
-	err = chainOfTrust.Populate(signerName)
+	authChain := NewAuthenticationChain()
+	err = authChain.Populate(signerName)
 
 	if err == ErrNoResult {
 		return nil, err
 	}
 
-	err = chainOfTrust.Verify(answer)
+	err = authChain.Verify(answer)
 	if err != nil {
 		log.Printf("DNSSEC validation failed: %s\n", err)
 		return nil, err
