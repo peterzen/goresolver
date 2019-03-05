@@ -31,6 +31,7 @@ var (
 	ErrRrsigValidityPeriod  = errors.New("invalid RRSIG validity period")
 	ErrUnknownDsDigestType  = errors.New("unknown DS digest type")
 	ErrDsInvalid            = errors.New("DS RR does not match DNSKEY")
+	ErrInvalidQuery         = errors.New("invalid query input")
 )
 
 var resolver *Resolver

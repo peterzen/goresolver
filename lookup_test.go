@@ -295,3 +295,14 @@ func TestMissingDsRR(t *testing.T) {
 		t.Error("should return no results")
 	}
 }
+
+func TestStrictNSQueryEmptyInput(t *testing.T) {
+	resolver := newResolver(t)
+	rrs, err := resolver.StrictNSQuery("", dns.TypeMX)
+	if err == nil {
+		t.Error("should return err")
+	}
+	if len(rrs) > 0 {
+		t.Error("shouldn't return results")
+	}
+}

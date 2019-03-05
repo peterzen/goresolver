@@ -111,7 +111,7 @@ func (resolver *Resolver) LookupIPType(qname string, qtype uint16) (ips []net.IP
 func (resolver *Resolver) StrictNSQuery(qname string, qtype uint16) (rrSet []dns.RR, err error) {
 
 	if len(qname) < 1 {
-		return nil, nil
+		return nil, ErrInvalidQuery
 	}
 
 	answer, err := queryRRset(qname, qtype)
