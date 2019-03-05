@@ -16,11 +16,11 @@ func (resolver *Resolver) LookupIP(qname string) (ips []net.IP, err error) {
 
 	qtypes := []uint16{dns.TypeA, dns.TypeAAAA}
 
-	answers := make([]*SignedRRSet, 0, len(qtypes))
+	answers := make([]*RRSet, 0, len(qtypes))
 
 	for _, qtype := range qtypes {
 
-		answer, err := querySignedRRset(qname, qtype)
+		answer, err := queryRRset(qname, qtype)
 		if answer == nil {
 			continue
 		}
@@ -46,7 +46,7 @@ func (resolver *Resolver) LookupIP(qname string) (ips []net.IP, err error) {
 	chainOfTrust := NewChainOfTrust()
 	err = chainOfTrust.Populate(signerName)
 	if err != nil {
-		log.Printf("Cannot populate chain of trust: %s\n", err)
+		log.Printf("Cannot populate authentication chain: %s\n", err)
 		return nil, err
 	}
 	resultIPs := make([]net.IP, MaxReturnedIPAddressesCount)
@@ -71,13 +71,14 @@ func (resolver *Resolver) LookupIPv6(qname string) (ips []net.IP, err error) {
 	return resolver.LookupIPType(qname, dns.TypeAAAA)
 }
 
+// Queries an A or AAAA RR
 func (resolver *Resolver) LookupIPType(qname string, qtype uint16) (ips []net.IP, err error) {
 
 	if len(qname) < 1 {
 		return nil, nil
 	}
 
-	answer, err := querySignedRRset(qname, qtype)
+	answer, err := queryRRset(qname, qtype)
 	if answer == nil {
 		return nil, ErrNoResult
 	}
@@ -91,14 +92,14 @@ func (resolver *Resolver) LookupIPType(qname string, qtype uint16) (ips []net.IP
 	}
 
 	signerName := answer.SignerName()
-	chainOfTrust := NewChainOfTrust()
-	err = chainOfTrust.Populate(signerName)
+	authChain := NewChainOfTrust()
+	err = authChain.Populate(signerName)
 	if err != nil {
-		log.Printf("Cannot populate chain of trust: %s\n", err)
+		log.Printf("Cannot populate authentication chain: %s\n", err)
 		return nil, err
 	}
 
-	err = chainOfTrust.Verify(answer)
+	err = authChain.Verify(answer)
 	if err != nil {
 		log.Printf("DNSSEC validation failed: %s\n", err)
 		return nil, err
@@ -113,7 +114,7 @@ func (resolver *Resolver) StrictNSQuery(qname string, qtype uint16) (rrSet []dns
 		return nil, nil
 	}
 
-	answer, err := querySignedRRset(qname, qtype)
+	answer, err := queryRRset(qname, qtype)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +145,7 @@ func (resolver *Resolver) StrictNSQuery(qname string, qtype uint16) (rrSet []dns
 	return answer.rrSet, nil
 }
 
-func formatResultRRs(signedRrset *SignedRRSet) []net.IP {
+func formatResultRRs(signedRrset *RRSet) []net.IP {
 	ips := make([]net.IP, 0, len(signedRrset.rrSet))
 	for _, rr := range signedRrset.rrSet {
 		switch t := rr.(type) {

@@ -66,12 +66,12 @@ func queryDelegation(domainName string) (signedZone *SignedZone, err error) {
 
 	signedZone = NewSignedZone(domainName)
 
-	signedZone.ds, err = querySignedRRset(domainName, dns.TypeDS)
+	signedZone.ds, err = queryRRset(domainName, dns.TypeDS)
 	if err == ErrNoResult {
 		return nil, ErrDsNotAvailable
 	}
 
-	signedZone.dnskey, err = querySignedRRset(domainName, dns.TypeDNSKEY)
+	signedZone.dnskey, err = queryRRset(domainName, dns.TypeDNSKEY)
 	signedZone.pubKeyLookup = make(map[uint16]*dns.DNSKEY)
 	for _, rr := range signedZone.dnskey.rrSet {
 		signedZone.addPubKey(rr.(*dns.DNSKEY))
@@ -80,12 +80,12 @@ func queryDelegation(domainName string) (signedZone *SignedZone, err error) {
 	return signedZone, nil
 }
 
-func getAnswers(qname string, qtypes []uint16) ([]SignedRRSet, error) {
+func getAnswers(qname string, qtypes []uint16) ([]RRSet, error) {
 
-	results := make([]SignedRRSet, 0, len(qtypes))
+	results := make([]RRSet, 0, len(qtypes))
 
 	for _, qtype := range qtypes {
-		r, err := querySignedRRset(qname, qtype)
+		r, err := queryRRset(qname, qtype)
 		if err != nil {
 			log.Printf("Cannot retrieve qtype %d %s: %v", qtype, qname, err)
 			continue

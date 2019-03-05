@@ -9,8 +9,8 @@ import (
 
 type SignedZone struct {
 	zone         string
-	dnskey       *SignedRRSet
-	ds           *SignedRRSet
+	dnskey       *RRSet
+	ds           *RRSet
 	parentZone   *SignedZone
 	pubKeyLookup map[uint16]*dns.DNSKEY
 }
@@ -23,7 +23,7 @@ func (z SignedZone) addPubKey(k *dns.DNSKEY) {
 	z.pubKeyLookup[k.KeyTag()] = k
 }
 
-func (z SignedZone) verifyRRSIG(signedRRset *SignedRRSet) (err error) {
+func (z SignedZone) verifyRRSIG(signedRRset *RRSet) (err error) {
 
 	if !signedRRset.IsSigned() {
 		return ErrInvalidRRsig
@@ -84,7 +84,7 @@ func (z *SignedZone) checkHasDnskeys() bool {
 func NewSignedZone(domainName string) *SignedZone {
 	return &SignedZone{
 		zone:   domainName,
-		ds:     &SignedRRSet{},
-		dnskey: &SignedRRSet{},
+		ds:     &RRSet{},
+		dnskey: &RRSet{},
 	}
 }

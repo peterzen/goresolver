@@ -5,12 +5,12 @@ import (
 	"log"
 )
 
-type SignedRRSet struct {
+type RRSet struct {
 	rrSet []dns.RR
 	rrSig *dns.RRSIG
 }
 
-func querySignedRRset(qname string, qtype uint16) (*SignedRRSet, error) {
+func queryRRset(qname string, qtype uint16) (*RRSet, error) {
 
 	r, err := resolver.queryFn(qname, qtype)
 
@@ -44,20 +44,20 @@ func querySignedRRset(qname string, qtype uint16) (*SignedRRSet, error) {
 	return result, nil
 }
 
-func (sRRset *SignedRRSet) IsSigned() bool {
+func (sRRset *RRSet) IsSigned() bool {
 	return sRRset.rrSig != nil
 }
 
-func (sRRset *SignedRRSet) IsEmpty() bool {
+func (sRRset *RRSet) IsEmpty() bool {
 	return len(sRRset.rrSet) < 1
 }
 
-func (sRRset *SignedRRSet) SignerName() string {
+func (sRRset *RRSet) SignerName() string {
 	return sRRset.rrSig.SignerName
 }
 
-func NewSignedRRSet() *SignedRRSet {
-	return &SignedRRSet{
+func NewSignedRRSet() *RRSet {
+	return &RRSet{
 		rrSet: make([]dns.RR, 0),
 	}
 }
