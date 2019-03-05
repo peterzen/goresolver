@@ -12,7 +12,7 @@ func TestSetClientConfig(t *testing.T) {
 }
 
 func TestDnsMessageInit(t *testing.T) {
-	msg := NewDnsMessage()
+	msg := NewDNSMessage()
 	opt := msg.IsEdns0()
 	if opt.Do() != true {
 		t.Logf("DO bit not enabled")

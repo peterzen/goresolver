@@ -3,7 +3,6 @@ package goresolver
 import (
 	"errors"
 	"github.com/miekg/dns"
-	"log"
 	"time"
 )
 
@@ -32,7 +31,7 @@ var (
 
 var resolver *Resolver
 
-func NewDnsMessage() *dns.Msg {
+func NewDNSMessage() *dns.Msg {
 	dnsMessage := &dns.Msg{
 		MsgHdr: dns.MsgHdr{
 			RecursionDesired: true,
@@ -43,7 +42,7 @@ func NewDnsMessage() *dns.Msg {
 }
 
 func localQuery(qname string, qtype uint16) (*dns.Msg, error) {
-	dnsMessage := NewDnsMessage()
+	dnsMessage := NewDNSMessage()
 	dnsMessage.SetQuestion(qname, qtype)
 
 	if resolver.dnsClientConfig == nil {
@@ -72,34 +71,15 @@ func queryDelegation(domainName string) (signedZone *SignedZone, err error) {
 	}
 
 	signedZone.dnskey, err = queryRRset(domainName, dns.TypeDNSKEY)
+	if err != nil {
+		return nil, err
+	}
 	signedZone.pubKeyLookup = make(map[uint16]*dns.DNSKEY)
 	for _, rr := range signedZone.dnskey.rrSet {
 		signedZone.addPubKey(rr.(*dns.DNSKEY))
 	}
 
 	return signedZone, nil
-}
-
-func getAnswers(qname string, qtypes []uint16) ([]RRSet, error) {
-
-	results := make([]RRSet, 0, len(qtypes))
-
-	for _, qtype := range qtypes {
-		r, err := queryRRset(qname, qtype)
-		if err != nil {
-			log.Printf("Cannot retrieve qtype %d %s: %v", qtype, qname, err)
-			continue
-		}
-		if r.IsSigned() {
-			results = append(results, *r)
-		}
-	}
-
-	if len(results) < 1 {
-		return results, ErrNoResult
-	}
-
-	return results, nil
 }
 
 func NewResolver(resolvConf string) (res *Resolver, err error) {

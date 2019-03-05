@@ -26,7 +26,10 @@ func mockQueryUpdate(t *testing.T, qname string, qtype uint16) (*dns.Msg, error)
 	}
 	mockFile, mockDir := getMockFile(t.Name(), qname, qtype)
 	if _, err := os.Stat(mockDir); os.IsNotExist(err) {
-		os.Mkdir(mockDir, 0755)
+		err := os.Mkdir(mockDir, 0755)
+		if err != nil {
+			t.Error("unable to create directory for mock files")
+		}
 	}
 	f, _ := os.Create(mockFile)
 	if f != nil {
