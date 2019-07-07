@@ -15,7 +15,7 @@ var isMockUpdate = false
 
 func getMockFile(testName string, qname string, qtype uint16) (fileName string, baseDir string) {
 	baseDir = path.Join("./testdata", testName)
-	fileName = path.Join(baseDir, fmt.Sprintf("%d_%s.txt", qtype, qname))
+	fileName = path.Join(baseDir, fmt.Sprintf("%d_%stxt", qtype, qname))
 	return fileName, baseDir
 }
 
