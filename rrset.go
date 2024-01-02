@@ -1,8 +1,9 @@
 package goresolver
 
 import (
-	"github.com/miekg/dns"
 	"log"
+
+	"github.com/miekg/dns"
 )
 
 type RRSet struct {

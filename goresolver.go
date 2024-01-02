@@ -2,6 +2,8 @@ package goresolver
 
 import (
 	"errors"
+	"time"
+
 	"github.com/miekg/dns"
 )
 
