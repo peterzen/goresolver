@@ -10,7 +10,7 @@ type RRSet struct {
 	rrSig *dns.RRSIG
 }
 
-func queryRRset(qname string, qtype uint16) (*RRSet, error) {
+func (resolver *Resolver) queryRRset(qname string, qtype uint16) (*RRSet, error) {
 
 	r, err := resolver.queryFn(qname, qtype)
 
@@ -55,6 +55,13 @@ func (sRRset *RRSet) IsEmpty() bool {
 
 func (sRRset *RRSet) SignerName() string {
 	return sRRset.rrSig.SignerName
+}
+
+func (sRRset *RRSet) CheckHeaderIntegrity(qname string) error {
+	if sRRset.rrSig != nil && sRRset.rrSig.Header().Name != qname {
+		return ErrForgedRRsig
+	}
+	return nil
 }
 
 func NewSignedRRSet() *RRSet {

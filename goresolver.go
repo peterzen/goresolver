@@ -3,7 +3,6 @@ package goresolver
 import (
 	"errors"
 	"github.com/miekg/dns"
-	"time"
 )
 
 const (
@@ -27,6 +26,7 @@ var (
 	ErrDnskeyNotAvailable   = errors.New("DNSKEY RR does not exist")
 	ErrDsNotAvailable       = errors.New("DS RR does not exist")
 	ErrInvalidRRsig         = errors.New("invalid RRSIG")
+	ErrForgedRRsig          = errors.New("forged RRSIG header")
 	ErrRrsigValidationError = errors.New("RR doesn't validate against RRSIG")
 	ErrRrsigValidityPeriod  = errors.New("invalid RRSIG validity period")
 	ErrUnknownDsDigestType  = errors.New("unknown DS digest type")
@@ -79,7 +79,7 @@ func queryDelegation(domainName string) (signedZone *SignedZone, err error) {
 
 	signedZone = NewSignedZone(domainName)
 
-	signedZone.dnskey, err = queryRRset(domainName, dns.TypeDNSKEY)
+	signedZone.dnskey, err = resolver.queryRRset(domainName, dns.TypeDNSKEY)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func queryDelegation(domainName string) (signedZone *SignedZone, err error) {
 		signedZone.addPubKey(rr.(*dns.DNSKEY))
 	}
 
-	signedZone.ds, _ = queryRRset(domainName, dns.TypeDS)
+	signedZone.ds, _ = resolver.queryRRset(domainName, dns.TypeDS)
 
 	return signedZone, nil
 }
