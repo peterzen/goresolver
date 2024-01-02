@@ -20,7 +20,7 @@ func (resolver *Resolver) LookupIP(qname string) (ips []net.IP, err error) {
 
 	for _, qtype := range qtypes {
 
-		answer, err := queryRRset(qname, qtype)
+		answer, err := resolver.queryRRset(qname, qtype)
 		if answer == nil {
 			continue
 		}
@@ -78,7 +78,7 @@ func (resolver *Resolver) LookupIPType(qname string, qtype uint16) (ips []net.IP
 		return nil, nil
 	}
 
-	answer, err := queryRRset(qname, qtype)
+	answer, err := resolver.queryRRset(qname, qtype)
 	if answer == nil {
 		return nil, ErrNoResult
 	}
@@ -114,7 +114,7 @@ func (resolver *Resolver) StrictNSQuery(qname string, qtype uint16) (rrSet []dns
 		return nil, ErrInvalidQuery
 	}
 
-	answer, err := queryRRset(qname, qtype)
+	answer, err := resolver.queryRRset(qname, qtype)
 	if err != nil {
 		return nil, err
 	}
@@ -125,6 +125,11 @@ func (resolver *Resolver) StrictNSQuery(qname string, qtype uint16) (rrSet []dns
 
 	if !answer.IsSigned() {
 		return nil, ErrResourceNotSigned
+	}
+
+	err = answer.CheckHeaderIntegrity(qname)
+	if err != nil {
+		return nil, err
 	}
 
 	signerName := answer.SignerName()

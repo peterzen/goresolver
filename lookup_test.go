@@ -306,3 +306,19 @@ func TestStrictNSQueryEmptyInput(t *testing.T) {
 		t.Error("shouldn't return results")
 	}
 }
+
+func TestForgedRRSIGHeader(t *testing.T) {
+	resolver := newResolver(t)
+	qname := "stakey.org."
+
+	answer, _ := resolver.queryRRset(qname, dns.TypeA)
+
+	// forge the RRSIG header
+	answer.rrSig.Header().Name = "forged.org."
+
+	err := answer.CheckHeaderIntegrity(qname)
+
+	if err != ErrForgedRRsig {
+		t.Error("should return ErrForgedRRsig")
+	}
+}
