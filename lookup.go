@@ -1,9 +1,10 @@
 package goresolver
 
 import (
-	"github.com/miekg/dns"
 	"log"
 	"net"
+
+	"github.com/miekg/dns"
 )
 
 const MaxReturnedIPAddressesCount = 64

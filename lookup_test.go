@@ -2,12 +2,12 @@ package goresolver
 
 import (
 	"fmt"
-	"github.com/miekg/dns"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
 	"testing"
+
+	"github.com/miekg/dns"
 )
 
 var isMockQuery = true
@@ -54,7 +54,7 @@ func newResolver(t *testing.T) (res *Resolver) {
 			return mockQueryUpdate(t, qname, qtype)
 		}
 		mockFile, _ := getMockFile(t.Name(), qname, qtype)
-		s, err := ioutil.ReadFile(mockFile)
+		s, err := os.ReadFile(mockFile)
 		if err != nil {
 			t.Error("mockQuery", err)
 		}
