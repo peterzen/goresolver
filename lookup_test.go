@@ -6,6 +6,7 @@ import (
 	"path"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/miekg/dns"
 )
@@ -45,6 +46,17 @@ func mockQueryUpdate(t *testing.T, qname string, qtype uint16) (*dns.Msg, error)
 
 func newResolver(t *testing.T) (res *Resolver) {
 	resolver, _ := NewResolver("./testdata/resolv.conf")
+
+	// The DNS fixture data embedded in the test suite contain
+	// expired RRSIG records. Override the current time so that
+	// signature validation succeeds when using the archived
+	// responses.
+	nowFunc = func() time.Time {
+		// 15 March 2019 00:00:00 UTC falls within the validity
+		// period of all recorded signatures.
+		return time.Date(2019, 3, 15, 0, 0, 0, 0, time.UTC)
+	}
+	t.Cleanup(func() { nowFunc = time.Now })
 	resolver.queryFn = func(qname string, qtype uint16) (*dns.Msg, error) {
 		msg := &dns.Msg{}
 		if isMockQuery == false {
