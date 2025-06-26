@@ -45,6 +45,7 @@ func mockQueryUpdate(t *testing.T, qname string, qtype uint16) (*dns.Msg, error)
 
 func newResolver(t *testing.T) (res *Resolver) {
 	resolver, _ := NewResolver("./testdata/resolv.conf")
+
 	resolver.queryFn = func(qname string, qtype uint16) (*dns.Msg, error) {
 		msg := &dns.Msg{}
 		if isMockQuery == false {

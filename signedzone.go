@@ -7,6 +7,11 @@ import (
 	"time"
 )
 
+// nowFunc returns the current time. It is a variable so
+// tests can override it to ensure deterministic behaviour
+// with archived DNS fixture data.
+var nowFunc = time.Now
+
 // SignedZone represents a DNSSEC-enabled zone, its DNSKEY and DS records
 type SignedZone struct {
 	zone         string
@@ -50,7 +55,7 @@ func (z SignedZone) verifyRRSIG(signedRRset *RRSet) (err error) {
 		return err
 	}
 
-	if !signedRRset.rrSig.ValidityPeriod(time.Now()) {
+	if !signedRRset.rrSig.ValidityPeriod(nowFunc()) {
 		log.Println("invalid validity period", err)
 		return ErrRrsigValidityPeriod
 	}
