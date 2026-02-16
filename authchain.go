@@ -51,7 +51,8 @@ func (authChain *AuthenticationChain) Populate(domainName string) error {
 // valid, it walks through the delegationChain checking the RRSIGs on
 // the DNSKEY and DS resource record sets, as well as correctness of each
 // delegation using the lower level methods in SignedZone.
-func (authChain *AuthenticationChain) Verify(answerRRset *RRSet) error {
+// The trustAnchor parameter is used to validate the root zone DNSKEY.
+func (authChain *AuthenticationChain) Verify(answerRRset *RRSet, trustAnchor *TrustAnchor) error {
 
 	signedZone := authChain.delegationChain[0]
 	if !signedZone.checkHasDnskeys() {
@@ -94,6 +95,15 @@ func (authChain *AuthenticationChain) Verify(answerRRset *RRSet) error {
 			if err != nil {
 				log.Printf("DS does not validate: %s", err)
 				return ErrDsInvalid
+			}
+		} else {
+			// This is the root zone (no parent), validate against trust anchor
+			if signedZone.zone == "." {
+				err := trustAnchor.VerifyRootZone(&signedZone)
+				if err != nil {
+					log.Printf("Root zone does not match trust anchor: %s\n", err)
+					return ErrRootZoneNotTrusted
+				}
 			}
 		}
 	}

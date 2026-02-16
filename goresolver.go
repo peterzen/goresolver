@@ -19,6 +19,7 @@ type Resolver struct {
 	timeNow         func() time.Time
 	dnsClient       *dns.Client
 	dnsClientConfig *dns.ClientConfig
+	trustAnchor     *TrustAnchor
 }
 
 // Errors returned by the verification/validation methods at all levels.
@@ -109,5 +110,12 @@ func NewResolver(resolvConf string) (res *Resolver, err error) {
 	}
 	resolver.queryFn = localQuery
 	resolver.timeNow = time.Now
+	
+	// Initialize the root zone trust anchor
+	resolver.trustAnchor, err = NewTrustAnchor()
+	if err != nil {
+		return nil, err
+	}
+	
 	return resolver, nil
 }

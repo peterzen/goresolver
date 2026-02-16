@@ -52,7 +52,7 @@ func (resolver *Resolver) LookupIP(qname string) (ips []net.IP, err error) {
 	}
 	resultIPs := make([]net.IP, MaxReturnedIPAddressesCount)
 	for _, answer := range answers {
-		err = authChain.Verify(answer)
+		err = authChain.Verify(answer, resolver.trustAnchor)
 		if err != nil {
 			log.Printf("DNSSEC validation failed: %s\n", err)
 			continue
@@ -100,7 +100,7 @@ func (resolver *Resolver) LookupIPType(qname string, qtype uint16) (ips []net.IP
 		return nil, err
 	}
 
-	err = authChain.Verify(answer)
+	err = authChain.Verify(answer, resolver.trustAnchor)
 	if err != nil {
 		log.Printf("DNSSEC validation failed: %s\n", err)
 		return nil, err
@@ -142,7 +142,7 @@ func (resolver *Resolver) StrictNSQuery(qname string, qtype uint16) (rrSet []dns
 		return nil, err
 	}
 
-	err = authChain.Verify(answer)
+	err = authChain.Verify(answer, resolver.trustAnchor)
 	if err != nil {
 		log.Printf("DNSSEC validation failed: %s\n", err)
 		return nil, err
