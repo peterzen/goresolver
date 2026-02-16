@@ -15,6 +15,5 @@ func TestMain(m *testing.M) {
 		return time.Date(2019, 3, 15, 0, 0, 0, 0, time.UTC)
 	}
 	code := m.Run()
-	nowFunc = time.Now
 	os.Exit(code)
 }
