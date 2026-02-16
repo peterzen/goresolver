@@ -16,7 +16,15 @@ When querying DNSSEC enabled zones, it performs a full verification of the resou
 * Performs the cryptographic verification of the `RRSIG` of the `DNSKEY` RRset with the public KSK
 * Checks the validity period of the `RRSIG` records
 
-Following these cryptographic verifications, the package then validates the authentication chain by walking up the delegation chain, checking the public `DNSKEY` RRs against the `DS` records in each parent zone, up to the TLD zone.  (For a more in-depth description of how DNSSEC works, see [this guide](https://www.cloudflare.com/dns/dnssec/how-dnssec-works/).)
+Following these cryptographic verifications, the package then validates the authentication chain by walking up the delegation chain, checking the public `DNSKEY` RRs against the `DS` records in each parent zone, up to the root zone.
+
+### Root Zone Trust Anchor
+
+The library includes the official IANA root zone trust anchor (KSK-2017, key tag 20326) to validate the root zone DNSKEY. This ensures that the entire chain of trust is verified all the way up to the root, preventing a misbehaving server from spoofing the DNS hierarchy.
+
+The root zone validation follows [RFC 4033](https://tools.ietf.org/html/rfc4033) and [RFC 4034](https://tools.ietf.org/html/rfc4034) specifications for DNSSEC validation.
+
+(For a more in-depth description of how DNSSEC works, see [this guide](https://www.cloudflare.com/dns/dnssec/how-dnssec-works/).)
 
 In case of any validation errors, the method returns a non-nil `err` value, and an empty result set.  
 

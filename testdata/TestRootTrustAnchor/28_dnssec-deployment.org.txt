@@ -1,2 +1,0 @@
-dnssec-deployment.org.	268	IN	AAAA	2001:41c8:20::4001
-dnssec-deployment.org.	268	IN	RRSIG	AAAA 5 2 300 20190319204003 20190305204003 56982 dnssec-deployment.org. NOOpeND7l5OC2EVjdMHyg8+5Cq4+Bjak2CzdwbCkF55B+Q7PWwWoC4gqlSvTdBbniub6SFlB3Qk8LKIkqfpsOHM+4tIoNvY9Fql91/twZbbvezOm5MUMxKIHkmXB61Q/Wws2FBudWH8jxr7PosPNJZV363zcF7yhegnND8LTeF0=

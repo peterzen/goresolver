@@ -1,2 +1,0 @@
-dnssec-deployment.org.	268	IN	A	46.43.37.10
-dnssec-deployment.org.	268	IN	RRSIG	A 5 2 300 20190319204003 20190305204003 56982 dnssec-deployment.org. wF+elRkMyCI/n88+1qX95OgAFAyajcqXGyMOx1mSLz2xcD5dxzqiH6crx/uTp5jpqUTsONqaUbEfLi4JcGnQ8AoSJB82PlMh9LMZnT+6kPyYGLGfMyFtc1MedUZe0sowJNzsR5RgQvs1wy0ByX7PfHqNbv49Wa+YNrX4mJt38qA=

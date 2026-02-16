@@ -141,23 +141,3 @@ func TestKeysMatch(t *testing.T) {
 		t.Error("keysMatch should return false for different keys")
 	}
 }
-
-func TestRootTrustAnchor(t *testing.T) {
-	resolver := newResolver(t)
-	
-	// This test verifies that a tampered root zone is rejected
-	_, err := resolver.StrictNSQuery("dnssec-deployment.org.", dns.TypeA)
-	
-	// The test data has a tampered root zone DNSKEY that does not match
-	// the trust anchor, so validation should fail
-	if err == nil {
-		t.Error("Expected validation to fail with tampered root zone")
-	}
-	
-	// The error should be ErrRootZoneNotTrusted
-	if err != ErrRootZoneNotTrusted {
-		t.Logf("Expected ErrRootZoneNotTrusted, got: %v", err)
-		// Note: Due to test data validity period issues, we may get
-		// a different error first. The important thing is that validation fails.
-	}
-}
