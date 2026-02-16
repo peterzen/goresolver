@@ -57,7 +57,7 @@ func TestVerifyRootZone_Valid(t *testing.T) {
 		rrSet: []dns.RR{ta.dnskeys[0]},
 	}
 
-	err = ta.VerifyRootZone(rootZone)
+	err = ta.VerifyRootZone(*rootZone)
 	if err != nil {
 		t.Errorf("VerifyRootZone should succeed with matching trust anchor, got: %v", err)
 	}
@@ -90,7 +90,7 @@ func TestVerifyRootZone_Invalid(t *testing.T) {
 		rrSet: []dns.RR{fakeKey},
 	}
 
-	err = ta.VerifyRootZone(rootZone)
+	err = ta.VerifyRootZone(*rootZone)
 	if err != ErrRootZoneNotTrusted {
 		t.Errorf("VerifyRootZone should fail with wrong key, expected ErrRootZoneNotTrusted, got: %v", err)
 	}
@@ -105,7 +105,7 @@ func TestVerifyRootZone_NotRootZone(t *testing.T) {
 	// Try to verify a non-root zone
 	zone := NewSignedZone("example.com.")
 	
-	err = ta.VerifyRootZone(zone)
+	err = ta.VerifyRootZone(*zone)
 	if err == nil || err.Error() != "not a root zone" {
 		t.Errorf("VerifyRootZone should fail for non-root zone, got: %v", err)
 	}

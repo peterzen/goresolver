@@ -66,7 +66,7 @@ func (authChain *AuthenticationChain) Verify(answerRRset *RRSet, trustAnchor *Tr
 	}
 
 	for i := range authChain.delegationChain {
-		signedZone := &authChain.delegationChain[i]
+		signedZone := authChain.delegationChain[i]
 
 		if signedZone.dnskey.IsEmpty() {
 			log.Printf("DNSKEY RR does not exist on %s\n", signedZone.zone)

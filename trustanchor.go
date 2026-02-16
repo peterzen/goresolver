@@ -49,7 +49,7 @@ func NewTrustAnchor() (*TrustAnchor, error) {
 
 // VerifyRootZone validates that the root zone DNSKEY matches one of the
 // configured trust anchors. It returns nil if validation succeeds.
-func (ta *TrustAnchor) VerifyRootZone(rootZone *SignedZone) error {
+func (ta *TrustAnchor) VerifyRootZone(rootZone SignedZone) error {
 	if rootZone.zone != "." {
 		return errors.New("not a root zone")
 	}
