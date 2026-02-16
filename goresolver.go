@@ -80,7 +80,7 @@ func localQuery(qname string, qtype uint16) (*dns.Msg, error) {
 // in that zone.  Returns a SignedZone or nil in case of error.
 func queryDelegation(domainName string) (signedZone *SignedZone, err error) {
 
-	signedZone = NewSignedZone(domainName, resolver)
+	signedZone = newSignedZone(domainName, resolver)
 
 	signedZone.dnskey, err = resolver.queryRRset(domainName, dns.TypeDNSKEY)
 	if err != nil {

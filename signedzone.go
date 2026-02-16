@@ -95,8 +95,9 @@ func (z *SignedZone) checkHasDnskeys() bool {
 	return len(z.dnskey.rrSet) > 0
 }
 
-// NewSignedZone initializes a new SignedZone and returns it.
-func NewSignedZone(domainName string, resolver *Resolver) *SignedZone {
+// newSignedZone initializes a new SignedZone and returns it.
+// This is an internal function not part of the public API.
+func newSignedZone(domainName string, resolver *Resolver) *SignedZone {
 	return &SignedZone{
 		zone:     domainName,
 		ds:       &RRSet{},
