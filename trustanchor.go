@@ -2,7 +2,6 @@ package goresolver
 
 import (
 	"errors"
-	"strings"
 
 	"github.com/miekg/dns"
 )
@@ -80,5 +79,5 @@ func keysMatch(a, b *dns.DNSKEY) bool {
 	return a.Flags == b.Flags &&
 		a.Protocol == b.Protocol &&
 		a.Algorithm == b.Algorithm &&
-		strings.EqualFold(a.PublicKey, b.PublicKey)
+		a.PublicKey == b.PublicKey
 }

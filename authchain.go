@@ -65,7 +65,8 @@ func (authChain *AuthenticationChain) Verify(answerRRset *RRSet, trustAnchor *Tr
 		return ErrInvalidRRsig
 	}
 
-	for _, signedZone := range authChain.delegationChain {
+	for i := range authChain.delegationChain {
+		signedZone := &authChain.delegationChain[i]
 
 		if signedZone.dnskey.IsEmpty() {
 			log.Printf("DNSKEY RR does not exist on %s\n", signedZone.zone)
@@ -99,7 +100,7 @@ func (authChain *AuthenticationChain) Verify(answerRRset *RRSet, trustAnchor *Tr
 		} else {
 			// This is the root zone (no parent), validate against trust anchor
 			if signedZone.zone == "." {
-				err := trustAnchor.VerifyRootZone(&signedZone)
+				err := trustAnchor.VerifyRootZone(signedZone)
 				if err != nil {
 					log.Printf("Root zone does not match trust anchor: %s\n", err)
 					return ErrRootZoneNotTrusted
