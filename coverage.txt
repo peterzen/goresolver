@@ -140,7 +140,7 @@ github.com/peterzen/goresolver/signedzone.go:82.33,84.4 1 27
 github.com/peterzen/goresolver/signedzone.go:86.3,87.22 2 0
 github.com/peterzen/goresolver/signedzone.go:89.2,89.31 1 0
 github.com/peterzen/goresolver/signedzone.go:94.45,96.2 1 19
-github.com/peterzen/goresolver/signedzone.go:99.71,106.2 1 44
+github.com/peterzen/goresolver/signedzone.go:100.71,107.2 1 44
 mode: atomic
 github.com/peterzen/goresolver/examples/mxlookup/mxlookup.go:10.13,12.22 1 0
 github.com/peterzen/goresolver/examples/mxlookup/mxlookup.go:12.22,15.3 2 0
