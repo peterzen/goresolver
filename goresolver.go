@@ -16,6 +16,7 @@ const (
 // queryFn can be used for mocking the actual DNS lookups in the test suite.
 type Resolver struct {
 	queryFn         func(string, uint16) (*dns.Msg, error)
+	timeNow         func() time.Time
 	dnsClient       *dns.Client
 	dnsClientConfig *dns.ClientConfig
 }
@@ -79,7 +80,7 @@ func localQuery(qname string, qtype uint16) (*dns.Msg, error) {
 // in that zone.  Returns a SignedZone or nil in case of error.
 func queryDelegation(domainName string) (signedZone *SignedZone, err error) {
 
-	signedZone = NewSignedZone(domainName)
+	signedZone = newSignedZone(domainName, resolver)
 
 	signedZone.dnskey, err = resolver.queryRRset(domainName, dns.TypeDNSKEY)
 	if err != nil {
@@ -107,5 +108,6 @@ func NewResolver(resolvConf string) (res *Resolver, err error) {
 		return nil, err
 	}
 	resolver.queryFn = localQuery
+	resolver.timeNow = time.Now
 	return resolver, nil
 }

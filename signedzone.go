@@ -4,7 +4,6 @@ import (
 	"github.com/miekg/dns"
 	"log"
 	"strings"
-	"time"
 )
 
 // SignedZone represents a DNSSEC-enabled zone, its DNSKEY and DS records
@@ -14,6 +13,7 @@ type SignedZone struct {
 	ds           *RRSet
 	parentZone   *SignedZone
 	pubKeyLookup map[uint16]*dns.DNSKEY
+	resolver     *Resolver
 }
 
 // lookupPubkey returns a DNSKEY by its keytag
@@ -50,7 +50,7 @@ func (z SignedZone) verifyRRSIG(signedRRset *RRSet) (err error) {
 		return err
 	}
 
-	if !signedRRset.rrSig.ValidityPeriod(time.Now()) {
+	if !signedRRset.rrSig.ValidityPeriod(z.resolver.timeNow()) {
 		log.Println("invalid validity period", err)
 		return ErrRrsigValidityPeriod
 	}
@@ -95,11 +95,13 @@ func (z *SignedZone) checkHasDnskeys() bool {
 	return len(z.dnskey.rrSet) > 0
 }
 
-// NewSignedZone initializes a new SignedZone and returns it.
-func NewSignedZone(domainName string) *SignedZone {
+// newSignedZone initializes a new SignedZone and returns it.
+// This is an internal function not part of the public API.
+func newSignedZone(domainName string, resolver *Resolver) *SignedZone {
 	return &SignedZone{
-		zone:   domainName,
-		ds:     &RRSet{},
-		dnskey: &RRSet{},
+		zone:     domainName,
+		ds:       &RRSet{},
+		dnskey:   &RRSet{},
+		resolver: resolver,
 	}
 }
