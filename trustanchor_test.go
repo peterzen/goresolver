@@ -45,16 +45,16 @@ func TestVerifyRootZone_Valid(t *testing.T) {
 	}
 
 	// Create a mock root zone with the correct KSK
-	rootZone := NewSignedZone(".")
-	rootZone.pubKeyLookup = make(map[uint16]*dns.DNSKEY)
+	rootZone := &SignedZone{
+		zone:         ".",
+		dnskey:       &RRSet{rrSet: []dns.RR{ta.dnskeys[0]}},
+		ds:           &RRSet{},
+		pubKeyLookup: make(map[uint16]*dns.DNSKEY),
+	}
 	
 	// Add the trust anchor key to the root zone
 	for _, key := range ta.dnskeys {
 		rootZone.addPubKey(key)
-	}
-	
-	rootZone.dnskey = &RRSet{
-		rrSet: []dns.RR{ta.dnskeys[0]},
 	}
 
 	err = ta.VerifyRootZone(*rootZone)
@@ -69,10 +69,6 @@ func TestVerifyRootZone_Invalid(t *testing.T) {
 		t.Fatalf("NewTrustAnchor failed: %v", err)
 	}
 
-	// Create a mock root zone with a different (wrong) key
-	rootZone := NewSignedZone(".")
-	rootZone.pubKeyLookup = make(map[uint16]*dns.DNSKEY)
-	
 	// Create a fake DNSKEY
 	fakeKey := &dns.DNSKEY{
 		Hdr: dns.RR_Header{
@@ -85,10 +81,15 @@ func TestVerifyRootZone_Invalid(t *testing.T) {
 		Algorithm: 8,
 		PublicKey: "FakeKeyDataThatDoesNotMatchTrustAnchor==",
 	}
-	rootZone.addPubKey(fakeKey)
-	rootZone.dnskey = &RRSet{
-		rrSet: []dns.RR{fakeKey},
+
+	// Create a mock root zone with a different (wrong) key
+	rootZone := &SignedZone{
+		zone:         ".",
+		dnskey:       &RRSet{rrSet: []dns.RR{fakeKey}},
+		ds:           &RRSet{},
+		pubKeyLookup: make(map[uint16]*dns.DNSKEY),
 	}
+	rootZone.addPubKey(fakeKey)
 
 	err = ta.VerifyRootZone(*rootZone)
 	if err != ErrRootZoneNotTrusted {
@@ -103,7 +104,12 @@ func TestVerifyRootZone_NotRootZone(t *testing.T) {
 	}
 
 	// Try to verify a non-root zone
-	zone := NewSignedZone("example.com.")
+	zone := &SignedZone{
+		zone:         "example.com.",
+		dnskey:       &RRSet{},
+		ds:           &RRSet{},
+		pubKeyLookup: make(map[uint16]*dns.DNSKEY),
+	}
 	
 	err = ta.VerifyRootZone(*zone)
 	if err == nil || err.Error() != "not a root zone" {
