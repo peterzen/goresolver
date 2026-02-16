@@ -6,6 +6,7 @@ import (
 	"path"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/miekg/dns"
 )
@@ -45,6 +46,11 @@ func mockQueryUpdate(t *testing.T, qname string, qtype uint16) (*dns.Msg, error)
 
 func newResolver(t *testing.T) (res *Resolver) {
 	resolver, _ := NewResolver("./testdata/resolv.conf")
+	// Mock time to March 7, 2019 at noon (UTC) to work with test data validity periods
+	// This date falls within all RRSIG validity periods in the test data
+	resolver.timeNow = func() time.Time {
+		return time.Date(2019, 3, 7, 12, 0, 0, 0, time.UTC)
+	}
 	resolver.queryFn = func(qname string, qtype uint16) (*dns.Msg, error) {
 		msg := &dns.Msg{}
 		if isMockQuery == false {
