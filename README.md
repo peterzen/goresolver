@@ -1,6 +1,8 @@
 go-resolver
 ===============
 
+[![Go CI](https://github.com/peterzen/goresolver/workflows/Go%20CI/badge.svg)](https://github.com/peterzen/goresolver/actions/workflows/go-ci.yml)
+
 A Golang DNSSEC validating resolver library implemented on top of [miekg/dns](https://github.com/miekg/dns).
 
 
